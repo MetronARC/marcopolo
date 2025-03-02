@@ -33,7 +33,7 @@ class Login extends BaseController
             } else {
                 session()->set('name', $logindata->name);
                 session()->set('email', $logindata->email);
-                session()->set('role', $logindata->role);
+                session()->set('type', $logindata->type);
                 session()->set('ip', $clientIP);
 
                 if (substr_count($clientIP, '.') === 3) {
