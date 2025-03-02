@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class TicketModel extends Model
 {
-    protected $table            = 'tickets';
+    protected $table            = 'ticket';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
@@ -15,15 +15,28 @@ class TicketModel extends Model
     protected $allowedFields    = [
         'id',
         'rma',
-        'customer_id',
-        'device_type',
+        'customer_name',
+        'customer_address',
+        'customer_phone',
+        'customer_email',
+        'device',
         'brand',
-        'model',
-        'serial_number',
-        'problem_description',
-        'status',
-        'created_at',
-        'updated_at'
+        'type',
+        'sn',
+        'warranty',
+        'warranty_date',
+        'device_condition',
+        'problem',
+        'detail_problem',
+        'accessories',
+        'engineer',
+        'ticket_status',
+        'close_date',
+        'payment',
+        'payment_amount',
+        'payment_at',
+        'payment_note',
+        'created_at'
     ];
 
     protected bool $allowEmptyInserts = false;

@@ -4,9 +4,9 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class PaymentModel extends Model
+class UserlogModel extends Model
 {
-    protected $table            = 'payments';
+    protected $table            = 'user_log';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
@@ -14,11 +14,11 @@ class PaymentModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
-        'ticket_id',
-        'amount',
-        'payment_method',
-        'status',
-        'transaction_id',
+        'userid',
+        'name',
+        'email',
+        'action',
+        'description',
         'created_at'
     ];
 

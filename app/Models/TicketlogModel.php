@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class TicketlogModel extends Model
 {
-    protected $table            = 'ticket_logs';
+    protected $table            = 'ticket_log';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
@@ -14,10 +14,10 @@ class TicketlogModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
-        'ticket_id',
-        'status',
-        'changed_by',
-        'created_at',
+        'rma',
+        'note',
+        'user',
+        'created_at'
     ];
 
     protected bool $allowEmptyInserts = false;

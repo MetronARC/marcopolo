@@ -41,13 +41,13 @@
 
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="">
-                            <i class="align-middle" data-feather="settings"></i> <span class="align-middle">Tickets</span>
+                            <i class="align-middle" data-feather="settings"></i> <span class="align-middle">Customer Service</span>
                         </a>
                     </li>
 
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="">
-                            <i class="align-middle" data-feather="calendar"></i> <span class="align-middle">Ticket History</span>
+                            <i class="align-middle" data-feather="calendar"></i> <span class="align-middle">Engineer</span>
                         </a>
                     </li>
 
@@ -59,13 +59,7 @@
 
                     <li class="sidebar-item">
                         <a class="sidebar-link" href="">
-                            <i class="align-middle" data-feather="dollar-sign"></i> <span class="align-middle">Payment</span>
-                        </a>
-                    </li>
-
-                    <li class="sidebar-item">
-                        <a class="sidebar-link" href="">
-                            <i class="align-middle" data-feather="users"></i> <span class="align-middle">Management</span>
+                            <i class="align-middle" data-feather="settings"></i> <span class="align-middle">Setting</span>
                         </a>
                     </li>
 
@@ -75,18 +69,6 @@
                         </a>
                     </li>
                 </ul>
-
-                <!-- <div class="sidebar-cta">
-                    <div class="sidebar-cta-content">
-                        <strong class="d-inline-block mb-2">Upgrade to Pro</strong>
-                        <div class="mb-3 text-sm">
-                            Are you looking for more components? Check out our premium version.
-                        </div>
-                        <div class="d-grid">
-                            <a href="upgrade-to-pro.html" class="btn btn-primary">Upgrade to Pro</a>
-                        </div>
-                    </div>
-                </div> -->
             </div>
         </nav>
 

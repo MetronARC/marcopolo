@@ -8,9 +8,27 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Home::index', ['filter' => 'authGuard']);
 $routes->get('login', 'Login::login');
 $routes->post('actionlogin', 'Login::actionlogin');
-$routes->get('logout', 'Login::logout');
-$routes->group('api', static function ($routes) {
-    $routes->post('user/create', 'Users::create');
+$routes->get('logout', 'Login::logout', ['filter' => 'authGuard']);
+
+// $routes->group('api', static function ($routes) {
+//     $routes->post('user/create', 'Users::create');
+// });
+
+$routes->group('user', static function ($routes) {
+    $routes->post('create', 'Users::create');
+    $routes->post('changepassword', 'Users::changepassword');
+    $routes->post('delete', 'Users::delete');
 });
 
-// , ['filter' => 'authGuard']
+$routes->group('ticket', static function ($routes) {
+    $routes->post('create', 'Ticket::create', ['filter' => 'authGuard']);
+    $routes->post('update/engineer', 'Ticket::update_engineer', ['filter' => 'authGuard']);
+    $routes->post('update/cs', 'Ticket::update_cs', ['filter' => 'authGuard']);
+    $routes->get('unfinish/engineer', 'Ticket::unfinish_engineer', ['filter' => 'authGuard']);
+    $routes->post('unfinish/cs', 'Ticket::unfinish_cs', ['filter' => 'authGuard']);
+    $routes->post('unfinish/checking', 'Ticket::unfinish_checking', ['filter' => 'authGuard']);
+    $routes->post('view', 'Ticket::view', ['filter' => 'authGuard']);
+});
+
+
+
