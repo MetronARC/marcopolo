@@ -72,7 +72,7 @@ class Login extends BaseController
         $log = [
             'userid'         => session('userid'),
             'email'          => session('email'),
-            'name'           => session('fullname'),
+            'name'           => session('name'),
             'action'         => '/logout',
             'created_at'     => date('Y-m-d H:i:s'),
             'description'    => session('logindata'),
