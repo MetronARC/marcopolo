@@ -19,6 +19,7 @@ $routes->group('user', static function ($routes) {
     $routes->post('create', 'Users::create');
     $routes->post('changepassword', 'Users::changepassword');
     $routes->post('delete', 'Users::delete');
+    $routes->post('view', 'Users::view');
 });
 
 $routes->group('ticket', static function ($routes) {
@@ -29,6 +30,14 @@ $routes->group('ticket', static function ($routes) {
     $routes->post('unfinish/cs', 'Ticket::unfinish_cs', ['filter' => 'authGuard']);
     $routes->post('unfinish/checking', 'Ticket::unfinish_checking', ['filter' => 'authGuard']);
     $routes->post('view', 'Ticket::view', ['filter' => 'authGuard']);
+    $routes->get('stat', 'Ticket::stat', ['filter' => 'authGuard']);
+});
+
+$routes->group('parts', static function ($routes) {
+    $routes->post('insert', 'Parts::insert', ['filter' => 'authGuard']);
+    $routes->post('assign', 'Parts::assign', ['filter' => 'authGuard']);
+    $routes->post('use', 'Parts::use', ['filter' => 'authGuard']);
+    $routes->post('cancel', 'Parts::cancel', ['filter' => 'authGuard']);
 });
 
 

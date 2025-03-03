@@ -49,6 +49,14 @@ class Users extends BaseController
         return $this->respond(['message' => 'Delete user successfully!'], 200);
     }
 
+    public function view()
+    {
+        $usermod = new UserModel();
+        $data = $usermod->where('user_id', $this->request->getVar('user_id'))->get()->getRow();
+
+        return json_encode($data);
+    }
+
     public function createid()
     {
         $usermod = new UserModel();

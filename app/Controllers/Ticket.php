@@ -5,7 +5,6 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\API\ResponseTrait;
-use App\Models\UserModel;
 use App\Models\TicketModel;
 use App\Models\TicketlogModel;
 
@@ -160,6 +159,23 @@ class Ticket extends BaseController
         $data = $ticketmod->where('rma', $this->request->getVar('rma'))->get()->getRow();
 
         return json_encode($data);
+    }
+
+    public function stat()
+    {
+        $ticketmod      = new TicketModel();
+        $checking       = $ticketmod->orderBy('created_at', 'DESC')->where('ticket_status', 'CHECKING')->get()->getResult();
+        $waitpart       = $ticketmod->orderBy('created_at', 'DESC')->where('ticket_status', 'WAIT FOR PART')->get()->getResult();
+        $waitpickup     = $ticketmod->orderBy('created_at', 'DESC')->where('ticket_status', 'WAIT FOR PICKUP')->get()->getResult();
+
+        $stat = [
+            'new'           => count($checking),
+            'checking'      => count($checking),
+            'waitpart'      => count($waitpart),
+            'waitpickup'    => count($waitpickup),
+        ];
+
+        return json_encode($stat);
     }
 
     public function createrma()
