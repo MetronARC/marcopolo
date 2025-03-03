@@ -11,9 +11,9 @@ $routes->get('login', 'Login::login');
 $routes->post('actionlogin', 'Login::actionlogin');
 $routes->get('logout', 'Login::logout', ['filter' => 'authGuard']);
 
-// $routes->group('api', static function ($routes) {
-//     $routes->post('user/create', 'Users::create');
-// });
+$routes->group('api', static function ($routes) {
+    $routes->post('user/create', 'Users::create');
+});
 
 $routes->group('user', static function ($routes) {
     $routes->post('create', 'Users::create');
