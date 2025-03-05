@@ -8,6 +8,9 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Home::index', ['filter' => 'authGuard']);
 $routes->get('logs', 'Logs::index');
 $routes->get('login', 'Login::login');
+$routes->get('dashboard', 'Pages::index');
+$routes->get('cs', 'Pages::ticketCS');
+$routes->get('engineer', 'Pages::ticketEngineer');
 $routes->post('actionlogin', 'Login::actionlogin');
 $routes->get('logout', 'Login::logout', ['filter' => 'authGuard']);
 
