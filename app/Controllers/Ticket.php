@@ -156,9 +156,13 @@ class Ticket extends BaseController
     public function view()
     {
         $ticketmod = new TicketModel();
-        $data = $ticketmod->where('rma', $this->request->getVar('rma'))->get()->getRow();
+        $dataticket = $ticketmod->where('rma', $this->request->getVar('rma'))->get()->getRow();
 
-        return json_encode($data);
+        $ticketlogmod = new TicketlogModel();
+        $datalog = $ticketlogmod->where('rma', $this->request->getVar('rma'))->orderBy('creaeted_at', 'DESC')->get()->getResult();
+
+        $dataticket->log = $datalog;
+        return json_encode($dataticket);
     }
 
     public function stat()
