@@ -21,6 +21,7 @@ $routes->group('api', static function ($routes) {
 $routes->group('user', static function ($routes) {
     $routes->post('create', 'Users::create');
     $routes->post('changepassword', 'Users::changepassword');
+    $routes->post('changetype', 'Users::changetype');
     $routes->post('delete', 'Users::delete');
     $routes->post('view', 'Users::view');
 });
@@ -34,13 +35,21 @@ $routes->group('ticket', static function ($routes) {
     $routes->post('unfinish/checking', 'Ticket::unfinish_checking', ['filter' => 'authGuard']);
     $routes->post('view', 'Ticket::view', ['filter' => 'authGuard']);
     $routes->get('stat', 'Ticket::stat', ['filter' => 'authGuard']);
+    $routes->get('stat_device', 'Ticket::stat_device', ['filter' => 'authGuard']);
 });
 
 $routes->group('parts', static function ($routes) {
     $routes->post('insert', 'Parts::insert', ['filter' => 'authGuard']);
     $routes->post('assign', 'Parts::assign', ['filter' => 'authGuard']);
     $routes->post('use', 'Parts::use', ['filter' => 'authGuard']);
+    $routes->get('search', 'Parts::search', ['filter' => 'authGuard']);
     $routes->post('cancel', 'Parts::cancel', ['filter' => 'authGuard']);
+});
+
+$routes->group('brand', static function ($routes) {
+    $routes->post('insert', 'Brand::insert', ['filter' => 'authGuard']);
+    $routes->post('update', 'Brand::update', ['filter' => 'authGuard']);
+    $routes->post('delete', 'Brand::delete', ['filter' => 'authGuard']);
 });
 
 

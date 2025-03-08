@@ -178,6 +178,25 @@ class Ticket extends BaseController
         return json_encode($stat);
     }
 
+    public function stat_device()
+    {
+        $ticketmod      = new TicketModel();
+        $ticketmod->where('created_at >=', date('Y-m-01 00:00:00'));
+        $ticketmod->where('created_at <=', date('Y-m-d 23:59:59'));
+        $data = $ticketmod->get()->getResult();
+
+        $deviceCounts = [];
+        foreach ($data as $item) {
+            $device = $item->device;
+            if (!isset($deviceCounts[$device])) {
+                $deviceCounts[$device] = 0;
+            }
+            $deviceCounts[$device]++;
+        }
+
+        return json_encode($deviceCounts);
+    }
+
     public function createrma()
     {
         $ticketmod = new TicketModel();

@@ -41,6 +41,18 @@ class Users extends BaseController
         return $this->respond(['message' => 'Change password successfully!'], 200);
     }
 
+    public function changetype()
+    {
+        $data = [
+            'type'      => password_hash($this->request->getVar('type'), PASSWORD_DEFAULT),
+        ];
+
+        $usermod = new UserModel();
+        $usermod->set($data)->where('user_id', $this->request->getVar('user_id'))->update();
+
+        return $this->respond(['message' => 'Change type successfully!'], 200);
+    }
+
     public function delete()
     {
         $usermod = new UserModel();
