@@ -43,7 +43,7 @@ $routes->group('parts', static function ($routes) {
     $routes->post('insert', 'Parts::insert', ['filter' => 'authGuard']);
     $routes->post('assign', 'Parts::assign', ['filter' => 'authGuard']);
     $routes->post('use', 'Parts::use', ['filter' => 'authGuard']);
-    $routes->get('search', 'Parts::search', ['filter' => 'authGuard']);
+    $routes->post('search', 'Parts::search', ['filter' => 'authGuard']);
     $routes->post('cancel', 'Parts::cancel', ['filter' => 'authGuard']);
 });
 
