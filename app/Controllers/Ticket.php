@@ -314,8 +314,13 @@ class Ticket extends BaseController
         }
     }
 
-    public function ticketprint()
+    public function ticketprint($rma)
     {
-        return view('pages/ticketprint');
+        $ticketmod      = new TicketModel();
+        $data = $ticketmod->where('rma', $rma)->get()->getRow();
+        $container = [
+            'ticket' => $data
+        ];
+        return view('pages/ticketprint', $container);
     }
 }

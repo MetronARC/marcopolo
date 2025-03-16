@@ -11,13 +11,12 @@
     <div class="container-fluid p-0 m-0">
         <div class="row">
             <div class="col-2">
-                <img src="/assets/img/logo.jpg" class="img-fluid" alt="">
+                <img src="/assets/img/logo.jpg" style="width: 80px; height: auto;" class="img-fluid" alt="">
             </div>
             <div class="col-10">
                 <b>PT. Karya Mura Niaga</b><br>
                 Alamat : lorem ipsum dolor sit amet bla bla bla<br>
-                Phone : 081289898989<br>
-                Email : test@admin.com
+                Phone : 081289898989 | Email : test@admin.com
             </div>
         </div><hr>
         <div class="row mb-2">
@@ -30,7 +29,7 @@
                         Tanggal<br>Nomor
                     </div>
                     <div class="col-7">
-                        <?= date('d F Y') ?><br>T240101011
+                        <?php $dateTime = new DateTime($ticket->created_at); echo $dateTime->format('Y-m-d'); ?><br><?= $ticket->rma ?>
                     </div>
                 </div>
             </div>
@@ -41,31 +40,31 @@
                     <tbody>
                         <tr>
                             <td style="width: 30%;">Nama</td>
-                            <td>: biji</td>
+                            <td>: <?= $ticket->customer_name ?></td>
                         </tr>
                         <tr>
                             <td style="width: 30%;">Alamat</td>
-                            <td>: jalan biji meledak no. 5</td>
+                            <td>: <?= $ticket->customer_address ?></td>
                         </tr>
                         <tr>
                             <td style="width: 30%;">Telepon</td>
-                            <td>: 081289898989</td>
+                            <td>: <?= $ticket->customer_phone ?></td>
                         </tr>
                         <tr>
                             <td style="width: 30%;">Brand</td>
-                            <td>: ASUS</td>
+                            <td>: <?= $ticket->brand ?></td>
                         </tr>
                         <tr>
                             <td style="width: 30%;">Type</td>
-                            <td>: HAHA2525</td>
+                            <td>: <?= $ticket->type ?></td>
                         </tr>
                         <tr>
                             <td style="width: 30%;">SN</td>
-                            <td>: ASD89Q5G</td>
+                            <td>: <?= $ticket->sn ?></td>
                         </tr>
                         <tr>
                             <td style="width: 30%;">Warranty</td>
-                            <td>: <b>Not Warranty</b> / Warranty until</td>
+                            <td>: <b><?= ($ticket->warranty == 1) ? 'In Warranty' : 'Not Warranty' ?></b> / <?= $ticket->warranty_date ?></td>
                         </tr>
                     </tbody>
                 </table>
@@ -75,36 +74,38 @@
                     <tbody>
                         <tr>
                             <td style="width: 30%;">Kondisi</td>
-                            <td>: black screen, lcd retak</td>
+                            <td>: <?= $ticket->device_condition ?></td>
                         </tr>
                         <tr>
                             <td style="width: 30%;">Problem</td>
-                            <td>: biji meledak</td>
+                            <td>: <?= $ticket->problem ?></td>
                         </tr>
                         <tr>
                             <td style="width: 30%;">Detail Problem</td>
-                            <td>: biji nya meledak tiba tiba</td>
+                            <td>: <?= $ticket->detail_problem ?></td>
                         </tr>
                         <tr>
                             <td style="width: 30%;">Aksesoris</td>
-                            <td>: SD Card</td>
+                            <td>: <?= $ticket->accessories ?></td>
                         </tr>
                         <tr>
                             <td style="width: 30%;">Engineer</td>
-                            <td>: YUDISTA RAHADIAN</td>
+                            <td>: <?= $ticket->engineer ?></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
         <div class="row">
+            <div class="col-1"></div>
             <div class="col-3 text-center">
                 CS<br><br><br><br><?= session('name') ?>
             </div>
+            <div class="col-4"></div>
             <div class="col-3 text-center">
-                Customer<br><br><br><br>Halimah
+                Customer<br><br><br><br><?= $ticket->customer_name ?>
             </div>
-            <div class="col-6"></div>
+            <div class="col-1"></div>
         </div>
     </div>
 </body>
