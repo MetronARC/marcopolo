@@ -58,7 +58,7 @@
                     </li>
 
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="">
+                        <a class="sidebar-link" href="setting">
                             <i class="align-middle" data-feather="settings"></i> <span class="align-middle">Setting</span>
                         </a>
                     </li>

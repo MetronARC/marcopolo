@@ -19,6 +19,7 @@ $routes->group('api', static function ($routes) {
 });
 
 $routes->group('user', static function ($routes) {
+    $routes->get('getall', 'Users::getall');
     $routes->post('create', 'Users::create');
     $routes->post('changepassword', 'Users::changepassword');
     $routes->post('changetype', 'Users::changetype');
@@ -51,6 +52,10 @@ $routes->group('brand', static function ($routes) {
     $routes->post('insert', 'Brand::insert', ['filter' => 'authGuard']);
     $routes->post('update', 'Brand::update', ['filter' => 'authGuard']);
     $routes->post('delete', 'Brand::delete', ['filter' => 'authGuard']);
+});
+
+$routes->group('setting', static function ($routes) {
+    $routes->get('/', 'Setting::index', ['filter' => 'authGuard']);
 });
 
 
