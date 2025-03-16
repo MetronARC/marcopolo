@@ -313,4 +313,9 @@ class Ticket extends BaseController
             return $newid;
         }
     }
+
+    public function ticketprint()
+    {
+        return view('pages/ticketprint');
+    }
 }
