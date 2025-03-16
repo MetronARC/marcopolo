@@ -113,6 +113,7 @@ class Parts extends BaseController
         if ($this->request->getVar('brand')) { $partmod->where('brand');}
         if ($this->request->getVar('type')) { $partmod->where('type');}
         if ($this->request->getVar('name')) { $partmod->where('name');}
+        $partmod->where('status', 'STOCK');
         $data = $partmod->get()->getResult();
 
         return json_encode($data);

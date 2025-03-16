@@ -50,19 +50,14 @@
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Brand</th>
+                                <th>Insert At</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="branddata">
                             <tr>
-                                <th>xx</th>
-                                <th>xx</th>
-                                <th>
-                                    <button class="btn btn-info">Edit</button>
-                                    <button class="btn btn-danger">Delete</button>
-                                </th>
+                                <td colspan="3" class="text-center">Data Empty</td>
                             </tr>
                         </tbody>
                     </table>
@@ -241,14 +236,54 @@
         });
     }
 
+    function getdatabrand() {
+        $.ajax({
+            url: '/brand/get',
+            type: 'get',
+            success: function(resp) {
+                let data = JSON.parse(resp)
+                console.log(data)
+                if (data.length > 0) {
+                    $('#branddata').empty()
+                    data.forEach(e => {
+                        $('#branddata').append(`
+                        <tr>
+                            <td>${e.brand}</td>
+                            <td>${e.created_at}</td>
+                            <td>
+                                <button class="btn btn-danger" onclick="deletebrand('${e.id}')"><i class="fa-solid fa-trash-can"></i></button>
+                            </td>
+                        <tr>
+                        `)
+                    });
+                } else {
+                    $('#branddata').empty().append(`
+                        <tr>
+                            <td colspan="3" class="text-center">Data Empty</td>
+                        </tr>
+                    `)
+                }
+            },
+            error: function() {
+                $('#branddata').empty().append(`
+                    <tr>
+                        <td colspan="3" class="text-center">Data Empty</td>
+                    </tr>
+                `)
+            }
+        })
+    }
+
     $(function() {
         getdatauser()
         $('#cardbrand').hide()
         $('#btnuser').click(function() {
+            getdatauser()
             $('#carduser').show()
             $('#cardbrand').hide()
         })
         $('#btnbrand').click(function() {
+            getdatabrand()
             $('#carduser').hide()
             $('#cardbrand').show()
         })
