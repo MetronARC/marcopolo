@@ -27,6 +27,17 @@ class Users extends BaseController
         $usermod = new UserModel();
         $usermod->save($data);
 
+        $logmod = new UserlogModel();
+        $log = [
+            'userid'         => session('userid'),
+            'email'          => session('email'),
+            'name'           => session('name'),
+            'action'         => '/user/create',
+            'created_at'     => date('Y-m-d H:i:s'),
+            'description'    => json_encode($data),
+        ];
+        $logmod->insert($log);
+
         return $this->respond(['message' => 'Create user successfully!'], 200);
     }
 
@@ -38,6 +49,17 @@ class Users extends BaseController
 
         $usermod = new UserModel();
         $usermod->set($data)->where('user_id', $this->request->getVar('user_id'))->update();
+
+        $logmod = new UserlogModel();
+        $log = [
+            'userid'         => session('userid'),
+            'email'          => session('email'),
+            'name'           => session('name'),
+            'action'         => '/user/changepassword',
+            'created_at'     => date('Y-m-d H:i:s'),
+            'description'    => json_encode(['user' => $this->request->getVar('user_id'), 'data' => $data]),
+        ];
+        $logmod->insert($log);
 
         return $this->respond(['message' => 'Change password successfully!'], 200);
     }
@@ -58,6 +80,17 @@ class Users extends BaseController
     {
         $usermod = new UserModel();
         $usermod->where('user_id', $this->request->getVar('user_id'))->delete();
+
+        $logmod = new UserlogModel();
+        $log = [
+            'userid'         => session('userid'),
+            'email'          => session('email'),
+            'name'           => session('name'),
+            'action'         => '/user/delete',
+            'created_at'     => date('Y-m-d H:i:s'),
+            'description'    => json_encode($this->request->getVar('user_id')),
+        ];
+        $logmod->insert($log);
 
         return $this->respond(['message' => 'Delete user successfully!'], 200);
     }

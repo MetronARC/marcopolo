@@ -8,6 +8,7 @@ use CodeIgniter\API\ResponseTrait;
 use App\Models\PartsModel;
 use App\Models\PartslogModel;
 use App\Models\TicketlogModel;
+use App\Models\UserlogModel;
 
 class Parts extends BaseController
 {
@@ -28,6 +29,17 @@ class Parts extends BaseController
 
         $partmod = new PartsModel();
         $partmod->save($data);
+
+        $logmod = new UserlogModel();
+        $log = [
+            'userid'         => session('userid'),
+            'email'          => session('email'),
+            'name'           => session('name'),
+            'action'         => '/part/insert',
+            'created_at'     => date('Y-m-d H:i:s'),
+            'description'    => json_encode($data),
+        ];
+        $logmod->insert($log);
 
         return $this->respond(['message' => 'Insert sparepart successfully!'], 200);
     }
@@ -51,6 +63,17 @@ class Parts extends BaseController
 
         $ticketlogmod = new TicketlogModel();
         $ticketlogmod->save($ticketlog);
+
+        $logmod = new UserlogModel();
+        $log = [
+            'userid'         => session('userid'),
+            'email'          => session('email'),
+            'name'           => session('name'),
+            'action'         => '/parts/assign',
+            'created_at'     => date('Y-m-d H:i:s'),
+            'description'    => json_encode($ticketlog),
+        ];
+        $logmod->insert($log);
 
         return $this->respond(['message' => 'Assign sparepart successfully!'], 200);
     }
@@ -87,6 +110,17 @@ class Parts extends BaseController
 
         $ticketlogmod = new TicketlogModel();
         $ticketlogmod->save($ticketlog);
+
+        $logmod = new UserlogModel();
+        $log = [
+            'userid'         => session('userid'),
+            'email'          => session('email'),
+            'name'           => session('name'),
+            'action'         => '/parts/use',
+            'created_at'     => date('Y-m-d H:i:s'),
+            'description'    => json_encode($ticketlog),
+        ];
+        $logmod->insert($log);
 
         return $this->respond(['message' => 'Update sparepart successfully!'], 200);
     }
@@ -151,6 +185,17 @@ class Parts extends BaseController
 
         $ticketlogmod = new TicketlogModel();
         $ticketlogmod->save($ticketlog);
+
+        $logmod = new UserlogModel();
+        $log = [
+            'userid'         => session('userid'),
+            'email'          => session('email'),
+            'name'           => session('name'),
+            'action'         => '/part/cancel',
+            'created_at'     => date('Y-m-d H:i:s'),
+            'description'    => json_encode($ticketlog),
+        ];
+        $logmod->insert($log);
 
         return $this->respond(['message' => 'Update sparepart successfully!'], 200);
     }

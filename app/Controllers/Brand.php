@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\API\ResponseTrait;
 use App\Models\BrandModel;
+use App\Models\UserlogModel;
 
 class Brand extends BaseController
 {
