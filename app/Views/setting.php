@@ -93,9 +93,10 @@
                     <div class="form-floating">
                         <select class="form-select" id="type" aria-label="">
                             <option selected disabled>User Type</option>
-                            <option value="1">One</option>
-                            <option value="2">Two</option>
-                            <option value="3">Three</option>
+                            <option value="CS">Customer Service</option>
+                            <option value="ADMIN">Admin</option>
+                            <option value="TECHNICIAN">Technician</option>
+                            <option value="MANAGER">Manager</option>
                         </select>
                         <label for="floatingSelect">Select Type</label>
                     </div>
@@ -132,7 +133,7 @@
                                 <td>${e.type}</td>
                                 <td>${lastlogin}</td>
                                 <td>
-                                    <button class="btn btn-info"><i class="fa-solid fa-key"></i></button>
+                                    <button class="btn btn-info" onclick="resetpassword('${e.user_id}', '${e.email}', '${e.name}')"><i class="fa-solid fa-key"></i></button>
                                     <button class="btn btn-danger" onclick="deleteuser('${e.user_id}', '${e.name}')"><i class="fa-solid fa-trash-can"></i></button>
                                 </td>
                             <tr>
@@ -201,6 +202,43 @@
             }
         })
         console.log(data)
+    }
+
+    function resetpassword(id, email, name) {
+        Swal.fire({
+            title: "Reset Password",
+            text: `Are you sure to reset password user ${name} ?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/user/changepassword',
+                    type: 'POST',
+                    data: {
+                        user_id: id,
+                        newpassword: email
+                    },
+                    success: function(resp) {
+                        // let data = JSON.parse(resp);
+                        Swal.fire({
+                            title: "Success",
+                            text: `Reset password successfully`,
+                            icon: "success",
+                            confirmButtonColor: "#3085d6",
+                            confirmButtonText: "Ok"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                getdatauser()
+                            }
+                        });
+                    }
+                })
+            }
+        });
     }
 
     $(function() {

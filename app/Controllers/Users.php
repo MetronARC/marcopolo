@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\API\ResponseTrait;
 use App\Models\UserModel;
+use App\Models\UserlogModel;
 use PhpParser\Node\Expr\FuncCall;
 
 class Users extends BaseController
@@ -97,5 +98,13 @@ class Users extends BaseController
         $usermod = new UserModel();
         $alldata = $usermod->findAll();
         return json_encode($alldata);
+    }
+
+    public function getlog()
+    {
+        $userlogmod = new UserlogModel();
+        $data = $userlogmod->orderBy('created_at', 'DESC')->findAll();
+
+        return json_encode($data);
     }
 }
