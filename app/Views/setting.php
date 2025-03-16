@@ -69,7 +69,8 @@
             <div class="card" id="cardlog">
                 <div class="card-header">
                     User Log
-                    <button class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#searchlogmodal"><i class="fa-solid fa-magnifying-glass"></i> Search Log</button>
+                    <button class="btn btn-success float-end me-2" onclick="getdatalog()"><i class="fa-solid fa-rotate fa-spin"></i></button>
+                    <button class="btn btn-success float-end me-2" onclick="opensearchlog()"><i class="fa-solid fa-magnifying-glass"></i> Search Log</button>
                 </div>
                 <div class="card-body">
                     <table class="table table-striped table-bordered">
@@ -143,6 +144,39 @@
                     <div class="form-floating mb-3">
                         <input type="text" class="form-control" id="brand" placeholder="">
                         <label for="floatingInput">Brand</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary float-end" onclick="submitbrand()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="searchlogmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Search Log</h1>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="searchlogform">
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="log_user" aria-label="">
+                        </select>
+                        <label for="log_user">Select user</label>
+                    </div>
+                    <div class="row">
+                        <div class="form-floating col-sm-6 col-12 mb-3">
+                            <input type="date" class="form-control" id="log_start" placeholder="">
+                            <label for="log_start">Start</label>
+                        </div>
+                        <div class="form-floating col-sm-6 col-12 mb-3">
+                            <input type="date" class="form-control" id="log_end" placeholder="">
+                            <label for="log_end">End</label>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -326,7 +360,9 @@
         $.ajax({
             url: '/brand/insert',
             type: 'POST',
-            data: {brand: $('#brand').val()},
+            data: {
+                brand: $('#brand').val()
+            },
             success: function(resp) {
                 $('#addbrandmodal').modal('hide')
                 $('#addbrandmodal input').val("")
