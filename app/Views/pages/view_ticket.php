@@ -143,7 +143,7 @@ helper('auth');
         <div class="col-12 col-xl-6">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Parts History</h5>
+                    <h5 class="card-title mb-0">Parts Assigned</h5>
                 </div>
                 <div class="card-body">
                     <div id="parts-logs">
@@ -154,6 +154,52 @@ helper('auth');
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Use Part Modal -->
+<div class="modal fade" id="usePartModal" tabindex="-1" aria-labelledby="usePartModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="usePartModalLabel">Use Part</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="usePartId">
+                <div class="mb-3">
+                    <label for="usePartNote" class="form-label">Note</label>
+                    <textarea class="form-control" id="usePartNote" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="confirmUsePart">Proceed</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Part Modal -->
+<div class="modal fade" id="cancelPartModal" tabindex="-1" aria-labelledby="cancelPartModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelPartModalLabel">Cancel Part</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="cancelPartId">
+                <div class="mb-3">
+                    <label for="cancelPartNote" class="form-label">Note</label>
+                    <textarea class="form-control" id="cancelPartNote" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="confirmCancelPart">Proceed</button>
             </div>
         </div>
     </div>
@@ -339,7 +385,7 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
 
             // Fetch parts history
-            fetch('/parts/getlog', {
+            fetch('/parts/get', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -351,50 +397,82 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Parts History:');
+                console.log('Parts Assigned:');
                 console.log(JSON.stringify(data, null, 2));
 
-                const partsLogsHtml = data.map(log => `
-                    <div class="timeline-item">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <small class="text-muted">${formatDate(log.created_at)}</small>
-                            </div>
-                            <div class="col-md-3">
-                                <span class="fw-bold">${log.user}</span>
-                            </div>
-                            <div class="col-md-6">
-                                <p class="mb-2">Part: ${log.part_name || '-'}</p>
-                                <p class="mb-2">Action: ${log.action || '-'}</p>
-                                <p class="mb-2">Note: ${log.note || '-'}</p>
-                            </div>
-                        </div>
-                        <hr>
-                    </div>
-                `).join('');
+                // Filter only ASSIGNED parts
+                const assignedParts = data.filter(part => part.status === "ASSIGNED");
 
-                document.getElementById('parts-logs').innerHTML = `
-                    <div class="timeline">
-                        <div class="row mb-3">
-                            <div class="col-md-3">
-                                <span class="text-muted">Date & Time</span>
-                            </div>
-                            <div class="col-md-3">
-                                <span class="text-muted">User</span>
-                            </div>
-                            <div class="col-md-6">
-                                <span class="text-muted">Details</span>
-                            </div>
-                        </div>
-                        ${partsLogsHtml || '<div class="text-center">No parts history found</div>'}
+                if (assignedParts.length === 0) {
+                    document.getElementById('parts-logs').innerHTML = `
+                        <div class="text-center">No parts assigned</div>
+                    `;
+                    return;
+                }
+
+                const partsTableHtml = `
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Part ID</th>
+                                    <th>Name</th>
+                                    <th>Brand</th>
+                                    <th>Type</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${assignedParts.map(part => `
+                                    <tr>
+                                        <td>${part.part_id}</td>
+                                        <td>${part.name || '-'}</td>
+                                        <td>${part.brand || '-'}</td>
+                                        <td>${part.type || '-'}</td>
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <button class="btn btn-success btn-sm use-part-btn" data-part-id="${part.part_id}">
+                                                    Use
+                                                </button>
+                                                <button class="btn btn-danger btn-sm cancel-part-btn" data-part-id="${part.part_id}">
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
                     </div>
                 `;
+
+                document.getElementById('parts-logs').innerHTML = partsTableHtml;
+
+                // Add event listeners for Use Part buttons
+                document.querySelectorAll('.use-part-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const partId = this.getAttribute('data-part-id');
+                        document.getElementById('usePartId').value = partId;
+                        const modal = new bootstrap.Modal(document.getElementById('usePartModal'));
+                        modal.show();
+                    });
+                });
+
+                // Add event listeners for Cancel Part buttons
+                document.querySelectorAll('.cancel-part-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const partId = this.getAttribute('data-part-id');
+                        document.getElementById('cancelPartId').value = partId;
+                        const modal = new bootstrap.Modal(document.getElementById('cancelPartModal'));
+                        modal.show();
+                    });
+                });
             })
             .catch(error => {
                 console.error('Error:', error);
                 document.getElementById('parts-logs').innerHTML = `
                     <div class="alert alert-danger">
-                        Error loading parts history
+                        Error loading parts assigned
                     </div>
                 `;
             });
@@ -450,6 +528,95 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error:', error);
             alert('Error updating ticket');
+        });
+    });
+
+    // Handle Use Part confirmation
+    document.getElementById('confirmUsePart').addEventListener('click', function() {
+        const partId = document.getElementById('usePartId').value;
+        const note = document.getElementById('usePartNote').value;
+
+        if (!note) {
+            alert('Please enter a note');
+            return;
+        }
+
+        fetch('/parts/use', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                part_id: partId,
+                rma: rma,
+                engineer: username,
+                note: note
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Close the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('usePartModal'));
+            modal.hide();
+            
+            // Reload the page to show updated status
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error using part');
+        });
+    });
+
+    // Handle Cancel Part confirmation
+    document.getElementById('confirmCancelPart').addEventListener('click', function() {
+        const partId = document.getElementById('cancelPartId').value;
+        const note = document.getElementById('cancelPartNote').value;
+
+        if (!note) {
+            alert('Please enter a note');
+            return;
+        }
+
+        // Show Sweet Alert confirmation
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, cancel it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('/parts/cancel', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        part_id: partId,
+                        rma: rma,
+                        engineer: username,
+                        note: note
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Close the modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('cancelPartModal'));
+                    modal.hide();
+                    
+                    // Reload the page to show updated status
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error canceling part');
+                });
+            }
         });
     });
 });
