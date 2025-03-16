@@ -139,7 +139,7 @@ helper('auth');
 <script>
     function loadTickets() {
         return new Promise((resolve, reject) => {
-            fetch('/ticket/unfinish/checking', {
+            fetch('/ticket/unfinish/cs', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

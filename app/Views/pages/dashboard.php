@@ -224,7 +224,7 @@
     }
 
     function updateLatestTickets() {
-        fetch('/ticket/unfinish/cs', {
+        fetch('/ticket/unfinish/checkin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -283,30 +283,81 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Pie chart
-        new Chart(document.getElementById("chartjs-dashboard-pie"), {
-            type: "pie",
-            data: {
-                labels: ["Chrome", "Firefox", "IE"],
-                datasets: [{
-                    data: [4306, 3801, 1689],
-                    backgroundColor: [
-                        window.theme.primary,
-                        window.theme.warning,
-                        window.theme.danger
-                    ],
-                    borderWidth: 5
-                }]
-            },
-            options: {
-                responsive: !window.MSInputMethodContext,
-                maintainAspectRatio: false,
-                legend: {
-                    display: false
-                },
-                cutoutPercentage: 75
-            }
-        });
+        let deviceChart = null;
+
+        function updateDeviceChart() {
+            fetch('/ticket/stat_device')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Device Statistics:', data);
+                    
+                    // Destroy existing chart if it exists
+                    if (deviceChart) {
+                        deviceChart.destroy();
+                    }
+
+                    // Create new chart with fetched data
+                    deviceChart = new Chart(document.getElementById("chartjs-dashboard-pie"), {
+                        type: "pie",
+                        data: {
+                            labels: ["Laptop", "Smartphone", "Smartwatch", "Tablet"],
+                            datasets: [{
+                                data: [
+                                    data.Laptop || 0,
+                                    data.Smartphone || 0,
+                                    data.Smartwatch || 0,
+                                    data.Tablet || 0
+                                ],
+                                backgroundColor: [
+                                    window.theme.primary,
+                                    window.theme.warning,
+                                    window.theme.danger,
+                                    window.theme.info
+                                ],
+                                borderWidth: 5
+                            }]
+                        },
+                        options: {
+                            responsive: !window.MSInputMethodContext,
+                            maintainAspectRatio: false,
+                            legend: {
+                                display: false
+                            },
+                            cutoutPercentage: 75
+                        }
+                    });
+
+                    // Update the table data
+                    const tableBody = document.querySelector('table tbody');
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td>Laptop</td>
+                            <td class="text-end">${data.Laptop || 0}</td>
+                        </tr>
+                        <tr>
+                            <td>Smartphone</td>
+                            <td class="text-end">${data.Smartphone || 0}</td>
+                        </tr>
+                        <tr>
+                            <td>Smartwatch</td>
+                            <td class="text-end">${data.Smartwatch || 0}</td>
+                        </tr>
+                        <tr>
+                            <td>Tablet</td>
+                            <td class="text-end">${data.Tablet || 0}</td>
+                        </tr>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error fetching device statistics:', error);
+                });
+        }
+
+        // Initial load
+        updateDeviceChart();
+
+        // Refresh every 30 seconds along with other stats
+        setInterval(updateDeviceChart, 30000);
     });
 </script>
 

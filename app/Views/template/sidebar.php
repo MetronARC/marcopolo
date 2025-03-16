@@ -29,7 +29,7 @@
             </li>
 
             <li class="sidebar-item">
-              <a class="sidebar-link" href="<?= base_url('/') ?>">
+              <a class="sidebar-link" href="<?= base_url('parts') ?>">
                 <i class="align-middle" data-feather="cpu"></i>
                 <span class="align-middle">Parts</span>
               </a>

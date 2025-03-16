@@ -159,7 +159,7 @@ class Ticket extends BaseController
         $dataticket = $ticketmod->where('rma', $this->request->getVar('rma'))->get()->getRow();
 
         $ticketlogmod = new TicketlogModel();
-        $datalog = $ticketlogmod->where('rma', $this->request->getVar('rma'))->orderBy('creaeted_at', 'DESC')->get()->getResult();
+        $datalog = $ticketlogmod->where('rma', $this->request->getVar('rma'))->orderBy('created_at', 'DESC')->get()->getResult();
 
         $dataticket->log = $datalog;
         return json_encode($dataticket);
