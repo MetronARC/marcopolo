@@ -58,6 +58,8 @@ class Login extends BaseController
                 ];
                 $logmod->insert($log);
 
+                $usermod->set('lastlogin_at', date('Y-m-d H:i:s'))->where('user_id', $logindata->user_id)->update();
+
                 return redirect()->to('/');
             }
         } else {

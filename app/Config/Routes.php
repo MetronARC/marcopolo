@@ -28,6 +28,7 @@ $routes->group('user', static function ($routes) {
     $routes->post('changetype', 'Users::changetype');
     $routes->post('delete', 'Users::delete');
     $routes->post('view', 'Users::view');
+    $routes->post('getlog', 'Users::getlog');
 });
 
 $routes->group('ticket', static function ($routes) {

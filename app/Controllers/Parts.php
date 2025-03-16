@@ -44,7 +44,7 @@ class Parts extends BaseController
 
         $ticketlog = [
             'rma' => $this->request->getVar('rma'),
-            'note' => $this->request->getVar('note'),
+            'note' => 'Part '.$this->request->getVar('part_name').' Assigned',
             'user' => $this->request->getVar('user'),
             'created_at' => date('Y-m-d H:i:s')
         ];

@@ -147,37 +147,12 @@ helper('auth');
     </div>
 </div>
 
-<!-- Assign Note Modal -->
-<div class="modal fade" id="assignNoteModal" tabindex="-1" aria-labelledby="assignNoteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="assignNoteModalLabel">Add Note for Part Assignment</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label for="assignmentNote" class="form-label">Note</label>
-                    <textarea class="form-control" id="assignmentNote" rows="3" required></textarea>
-                </div>
-                <input type="hidden" id="selectedRma">
-                <input type="hidden" id="selectedPartId">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="confirmAssignment">Assign Part</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
 $(document).ready(function() {
     const insertModal = new bootstrap.Modal(document.getElementById('insertPartModal'));
     const assignTicketModal = new bootstrap.Modal(document.getElementById('assignTicketModal'));
-    const assignNoteModal = new bootstrap.Modal(document.getElementById('assignNoteModal'));
     const user = '<?= session('name') ?>';
 
     function getStatusColor(status) {
@@ -242,6 +217,7 @@ $(document).ready(function() {
     // Handle Assign to Ticket button click
     $(document).on('click', '.assignToTicket', function() {
         const partId = $(this).data('part-id');
+        const partName = $(this).data('part-name');
         
         // Load unfinished tickets
         $.ajax({
@@ -269,7 +245,8 @@ $(document).ready(function() {
                                 <td>
                                     <button class="btn btn-sm btn-primary selectTicket" 
                                             data-rma="${ticket.rma}"
-                                            data-part-id="${partId}">
+                                            data-part-id="${partId}"
+                                            data-part-name="${partName}">
                                         Select
                                     </button>
                                 </td>
@@ -295,32 +272,7 @@ $(document).ready(function() {
     $(document).on('click', '.selectTicket', function() {
         const rma = $(this).data('rma');
         const partId = $(this).data('part-id');
-        
-        // Store the values in hidden inputs
-        $('#selectedRma').val(rma);
-        $('#selectedPartId').val(partId);
-        
-        // Hide ticket modal and show note modal
-        assignTicketModal.hide();
-        assignNoteModal.show();
-    });
-
-    // Handle final assignment confirmation
-    $('#confirmAssignment').on('click', function() {
-        const note = $('#assignmentNote').val();
-        if (!note) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Warning',
-                text: 'Please enter a note for this assignment',
-                confirmButtonColor: '#3085d6'
-            });
-            return;
-        }
-
-        // Get the stored values
-        const rma = $('#selectedRma').val();
-        const partId = $('#selectedPartId').val();
+        const partName = $(this).data('part-name');
         
         // Directly assign the part to the ticket
         $.ajax({
@@ -329,13 +281,12 @@ $(document).ready(function() {
             data: {
                 part_id: partId,
                 rma: rma,
-                note: note,
+                part_name: partName,
                 user: user
             },
             dataType: 'json',
             success: function(response) {
-                assignNoteModal.hide();
-                $('#assignmentNote').val(''); // Clear the note
+                assignTicketModal.hide();
                 
                 Swal.fire({
                     icon: 'success',
@@ -406,7 +357,9 @@ $(document).ready(function() {
                         filteredData.forEach(function(part) {
                             let actionButton = '';
                             if (part.status === 'STOCK') {
-                                actionButton = `<button class="btn btn-sm btn-primary assignToTicket" data-part-id="${part.part_id}">Assign to Ticket</button>`;
+                                actionButton = `<button class="btn btn-sm btn-primary assignToTicket" 
+                                    data-part-id="${part.part_id}"
+                                    data-part-name="${part.name}">Assign to Ticket</button>`;
                             } else {
                                 actionButton = `<span class="badge bg-secondary">No actions available</span>`;
                             }
