@@ -4,9 +4,9 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class PartModel extends Model
+class PartslogModel extends Model
 {
-    protected $table            = 'parts';
+    protected $table            = 'sparepart_log';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
@@ -14,10 +14,13 @@ class PartModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
-        'name',
-        'brand',
-        'stock',
-        'price'
+        'rma',
+        'engineer',
+        'part_id',
+        'status',
+        'used',
+        'note',
+        'created_at'
     ];
 
     protected bool $allowEmptyInserts = false;

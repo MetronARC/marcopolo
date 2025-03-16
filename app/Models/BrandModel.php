@@ -4,9 +4,9 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class PaymentModel extends Model
+class BrandModel extends Model
 {
-    protected $table            = 'payments';
+    protected $table            = 'brand';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
@@ -14,11 +14,7 @@ class PaymentModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
-        'ticket_id',
-        'amount',
-        'payment_method',
-        'status',
-        'transaction_id',
+        'brand',
         'created_at'
     ];
 

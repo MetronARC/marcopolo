@@ -4,9 +4,9 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class TicketpartModel extends Model
+class UserlogModel extends Model
 {
-    protected $table            = 'ticket_parts';
+    protected $table            = 'user_log';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
@@ -14,10 +14,11 @@ class TicketpartModel extends Model
     protected $protectFields    = true;
     protected $allowedFields    = [
         'id',
-        'ticket_id',
-        'part_id',
-        'quantity',
-        'price',
+        'userid',
+        'name',
+        'email',
+        'action',
+        'description',
         'created_at'
     ];
 

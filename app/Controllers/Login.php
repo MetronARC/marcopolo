@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\UserModel;
+use App\Models\UserlogModel;
 
 class Login extends BaseController
 {
@@ -31,9 +32,10 @@ class Login extends BaseController
                 session()->setFlashdata('error', 'Incorrect username or password, please try again ! ');
                 return redirect()->to('login');
             } else {
+                session()->set('userid', $logindata->user_id);
                 session()->set('name', $logindata->name);
                 session()->set('email', $logindata->email);
-                session()->set('role', $logindata->role);
+                session()->set('type', $logindata->type);
                 session()->set('ip', $clientIP);
 
                 if (substr_count($clientIP, '.') === 3) {
@@ -45,16 +47,16 @@ class Login extends BaseController
 
                 session()->set('logindata', json_encode($locationData));
 
-                // $logmod = new LogModel();
-                // $log = [
-                //     'email'         => $logindata->email,
-                //     'name'          => $logindata->name,
-                //     'action'        => '/login/action',
-                //     'created_at'    => date('Y-m-d H:i:s'),
-                //     'userlog'       => json_encode($locationData),
-                //     'detail'        => 'User Login'
-                // ];
-                // $logmod->insert($log);
+                $logmod = new UserlogModel();
+                $log = [
+                    'userid'        => $logindata->user_id,
+                    'email'         => $logindata->email,
+                    'name'          => $logindata->name,
+                    'action'        => 'LOGIN',
+                    'created_at'    => date('Y-m-d H:i:s'),
+                    'description'   => json_encode($locationData),
+                ];
+                $logmod->insert($log);
 
                 return redirect()->to('/');
             }
@@ -66,16 +68,16 @@ class Login extends BaseController
 
     public function logout()
     {
-        // $logmod = new LogModel();
-        // $log = [
-        //     'email'         => session('email'),
-        //     'name'          => session('fullname'),
-        //     'action'        => '/logout',
-        //     'created_at'    => date('Y-m-d H:i:s'),
-        //     'userlog'       => session('logindata'),
-        //     'detail'        => 'User Logout'
-        // ];
-        // $logmod->insert($log);
+        $logmod = new UserlogModel();
+        $log = [
+            'userid'         => session('userid'),
+            'email'          => session('email'),
+            'name'           => session('name'),
+            'action'         => '/logout',
+            'created_at'     => date('Y-m-d H:i:s'),
+            'description'    => session('logindata'),
+        ];
+        $logmod->insert($log);
 
         session()->destroy();
         return redirect()->to('login');
