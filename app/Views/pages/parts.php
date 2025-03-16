@@ -27,7 +27,6 @@ helper('auth');
                     <div class="input-group">
                         <select class="form-select" id="searchBrand">
                             <option value="">Select brand...</option>
-                            <option value="HP">HP</option>
                         </select>
                     </div>
                 </div>
@@ -88,7 +87,9 @@ helper('auth');
                     </div>
                     <div class="mb-3">
                         <label for="brand" class="form-label">Brand</label>
-                        <input type="text" class="form-control" id="brand" name="brand" required>
+                        <select class="form-select" id="brand" name="brand" required>
+                            <option value="">Select brand...</option>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="type" class="form-label">Type</label>
@@ -154,6 +155,35 @@ $(document).ready(function() {
     const insertModal = new bootstrap.Modal(document.getElementById('insertPartModal'));
     const assignTicketModal = new bootstrap.Modal(document.getElementById('assignTicketModal'));
     const user = '<?= session('name') ?>';
+
+    // Load brands for dropdown
+    function loadBrands() {
+        $.ajax({
+            url: '<?= base_url('brand/get') ?>',
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                const brandDropdowns = $('#brand, #searchBrand');
+                brandDropdowns.find('option:not(:first)').remove(); // Clear existing options except the first one
+                
+                response.forEach(function(brand) {
+                    brandDropdowns.append(`<option value="${brand.brand}">${brand.brand}</option>`);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Failed to load brands:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Failed to load brands: ' + error,
+                    confirmButtonColor: '#d33'
+                });
+            }
+        });
+    }
+
+    // Load brands when page loads
+    loadBrands();
 
     function getStatusColor(status) {
         switch (status) {

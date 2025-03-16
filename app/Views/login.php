@@ -98,6 +98,8 @@
 	<script src="assets/js/app.js"></script>
 	<script>
 		$(document).ready(function() {
+			var userId = null;
+
 			// Handle login form submission
 			$('#loginForm').on('submit', function(e) {
 				e.preventDefault();
@@ -105,10 +107,26 @@
 				var email = $('#email').val();
 				var password = $('#password').val();
 				
-				// Check if email equals password (first login condition)
+				// Check if email equals password
 				if (email === password) {
-					var passwordModal = new bootstrap.Modal(document.getElementById('passwordChangeModal'));
-					passwordModal.show();
+					// Try to login with the actual credentials
+					$.ajax({
+						url: 'actionlogin',
+						method: 'POST',
+						data: {
+							email: email,
+							password: password
+						},
+						success: function(response) {
+							// Show the password change modal if login was successful
+							var passwordModal = new bootstrap.Modal(document.getElementById('passwordChangeModal'));
+							passwordModal.show();
+						},
+						error: function() {
+							// If login failed, submit form normally to show the error
+							$('#loginForm')[0].submit();
+						}
+					});
 				} else {
 					// Normal login flow
 					this.submit();
@@ -121,10 +139,17 @@
 				
 				var newPassword = $('#newPassword').val();
 				var retypePassword = $('#retypePassword').val();
+				var email = $('#email').val();
 				
 				// Validate passwords match
 				if (newPassword !== retypePassword) {
 					$('#passwordError').removeClass('d-none').text('Passwords do not match!');
+					return;
+				}
+
+				// Validate new password is not the same as email
+				if (newPassword === email) {
+					$('#passwordError').removeClass('d-none').text('New password cannot be the same as your email!');
 					return;
 				}
 
@@ -133,12 +158,19 @@
 					url: 'user/changepassword',
 					method: 'POST',
 					data: {
-						password: newPassword
+						newpassword: newPassword,
+						user_id: '<?= session()->get('userid') ?>'
 					},
 					success: function(response) {
-						if (response.success) {
-							// After successful password change, submit the login form
-							$('#loginForm')[0].submit();
+						if (response.message === 'Change password successfully!') {
+							// Show success message and redirect to login
+							Swal.fire({
+								title: "Success!",
+								text: "Password changed successfully. Please login with your new password.",
+								icon: "success"
+							}).then((result) => {
+								window.location.href = 'login';
+							});
 						} else {
 							$('#passwordError').removeClass('d-none').text(response.message || 'Error changing password');
 						}
