@@ -12,6 +12,9 @@
                 <button class="btn btn-lg btn-primary mb-3" id="btnuser">User Manager</button>
             </div>
             <div class="col-12 d-grid">
+                <button class="btn btn-lg btn-primary mb-3" id="btnlog">User Log</button>
+            </div>
+            <div class="col-12 d-grid">
                 <button class="btn btn-lg btn-primary mb-3" id="btnbrand">Brand</button>
             </div>
         </div>
@@ -44,7 +47,7 @@
             <div class="card" id="cardbrand">
                 <div class="card-header">
                     Brand
-                    <button class="btn btn-success float-end"><i class="fa-solid fa-plus"></i> Add Brand</button>
+                    <button class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#addbrandmodal"><i class="fa-solid fa-plus"></i> Add Brand</button>
                 </div>
                 <div class="card-body">
                     <table class="table table-striped table-bordered">
@@ -58,6 +61,30 @@
                         <tbody id="branddata">
                             <tr>
                                 <td colspan="3" class="text-center">Data Empty</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card" id="cardlog">
+                <div class="card-header">
+                    User Log
+                    <button class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#searchlogmodal"><i class="fa-solid fa-magnifying-glass"></i> Search Log</button>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logdata">
+                            <tr>
+                                <td colspan="5" class="text-center">Data Empty</td>
                             </tr>
                         </tbody>
                     </table>
@@ -99,6 +126,28 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary float-end" onclick="submituser()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addbrandmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Add User</h1>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="insertbrand">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="brand" placeholder="">
+                        <label for="floatingInput">Brand</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary float-end" onclick="submitbrand()">Submit</button>
             </div>
         </div>
     </div>
@@ -196,7 +245,6 @@
                 getdatauser()
             }
         })
-        console.log(data)
     }
 
     function resetpassword(id, email, name) {
@@ -251,7 +299,7 @@
                             <td>${e.brand}</td>
                             <td>${e.created_at}</td>
                             <td>
-                                <button class="btn btn-danger" onclick="deletebrand('${e.id}')"><i class="fa-solid fa-trash-can"></i></button>
+                                <button class="btn btn-danger" onclick="deletebrand('${e.id}', '${e.brand}')"><i class="fa-solid fa-trash-can"></i></button>
                             </td>
                         <tr>
                         `)
@@ -274,18 +322,115 @@
         })
     }
 
+    function submitbrand() {
+        $.ajax({
+            url: '/brand/insert',
+            type: 'POST',
+            data: {brand: $('#brand').val()},
+            success: function(resp) {
+                $('#addbrandmodal').modal('hide')
+                $('#addbrandmodal input').val("")
+                Swal.fire({
+                    title: "Success!",
+                    text: "Insert Brand Successfully!",
+                    icon: "success"
+                });
+                getdatabrand()
+            }
+        })
+    }
+
+    function deletebrand(id, name) {
+        Swal.fire({
+            title: "Delete Brand",
+            text: `Are you sure to delete brand ${name} ?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/brand/delete',
+                    type: 'POST',
+                    data: {
+                        id: id
+                    },
+                    success: function(resp) {
+                        // let data = JSON.parse(resp);
+                        Swal.fire({
+                            title: "Success",
+                            text: `Delete brand successfully`,
+                            icon: "success",
+                            confirmButtonColor: "#3085d6",
+                            confirmButtonText: "Ok"
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                getdatabrand()
+                            }
+                        });
+                    }
+                })
+            }
+        });
+    }
+
+    function getdatalog() {
+        $.ajax({
+            url: '/user/getlog',
+            type: 'get',
+            success: function(resp) {
+                let data = JSON.parse(resp)
+                console.log(data)
+                if (data.length > 0) {
+                    $('#logdata').empty()
+                    data.forEach(e => {
+                        $('#logdata').append(`
+                        <tr>
+                            <td>${e.created_at}</td>
+                            <td>${e.userid}</td>
+                            <td>${e.name}</td>
+                            <td>${e.email}</td>
+                            <td>${e.action}</td>
+                        <tr>
+                        `)
+                    });
+                } else {
+                    $('#logdata').empty().append(`
+                        <tr>
+                            <td colspan="5" class="text-center">Data Empty</td>
+                        </tr>
+                    `)
+                }
+            },
+            error: function() {
+                $('#logdata').empty().append(`
+                    <tr>
+                        <td colspan="5" class="text-center">Data Empty</td>
+                    </tr>
+                `)
+            }
+        })
+    }
+
     $(function() {
         getdatauser()
-        $('#cardbrand').hide()
+        $('#cardbrand, #cardlog').hide()
         $('#btnuser').click(function() {
             getdatauser()
             $('#carduser').show()
-            $('#cardbrand').hide()
+            $('#cardbrand, #cardlog').hide()
         })
         $('#btnbrand').click(function() {
             getdatabrand()
-            $('#carduser').hide()
+            $('#carduser, #cardlog').hide()
             $('#cardbrand').show()
+        })
+        $('#btnlog').click(function() {
+            getdatalog()
+            $('#carduser, #cardbrand').hide()
+            $('#cardlog').show()
         })
     })
 </script>

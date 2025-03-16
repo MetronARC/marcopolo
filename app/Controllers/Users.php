@@ -103,7 +103,7 @@ class Users extends BaseController
     public function getlog()
     {
         $userlogmod = new UserlogModel();
-        $data = $userlogmod->orderBy('created_at', 'DESC')->findAll();
+        $data = $userlogmod->orderBy('created_at', 'DESC')->limit(50)->get()->getResult();
 
         return json_encode($data);
     }
