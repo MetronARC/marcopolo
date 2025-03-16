@@ -181,7 +181,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary float-end" onclick="submitbrand()">Submit</button>
+                <button type="button" class="btn btn-primary float-end" onclick="submitsearch()">Submit</button>
             </div>
         </div>
     </div>
@@ -446,6 +446,66 @@
                         <td colspan="5" class="text-center">Data Empty</td>
                     </tr>
                 `)
+            }
+        })
+    }
+
+    function fetchsearchlog(list) {
+        let data = JSON.parse(list)
+        console.log(data)
+        if (data.length > 0) {
+            $('#logdata').empty()
+            data.forEach(e => {
+                $('#logdata').append(`
+                    <tr>
+                        <td>${e.created_at}</td>
+                        <td>${e.userid}</td>
+                        <td>${e.name}</td>
+                        <td>${e.email}</td>
+                        <td>${e.action}</td>
+                    <tr>
+                `)
+            });
+        } else {
+            $('#logdata').empty().append(`
+                <tr>
+                    <td colspan="5" class="text-center">Data Empty</td>
+                </tr>
+            `)
+        }
+    }
+
+    function opensearchlog() {
+        $.ajax({
+            url: '/user/getall',
+            type: 'get',
+            success: function(resp) {
+                let data = JSON.parse(resp);
+                $('#log_user').empty()
+                $.each(data, function(index, option) {
+                    var newOption = $('<option>', {
+                        value: option.user_id,
+                        text: option.user_id + ' / ' + option.name
+                    });
+                    $('#log_user').append(newOption);
+                });
+                $('#searchlogmodal').modal('show')
+            }
+        })
+    }
+
+    function submitsearch() {
+        $.ajax({
+            url: '/user/searchlog',
+            type: 'POST',
+            data: {
+                user: $('#log_user').val(),
+                start: $('#log_start').val(),
+                end: $('#log_end').val()
+            },
+            success: function(resp) {
+                $('#searchlogmodal').modal('hide')
+                fetchsearchlog(resp)
             }
         })
     }

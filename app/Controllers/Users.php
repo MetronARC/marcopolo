@@ -140,4 +140,16 @@ class Users extends BaseController
 
         return json_encode($data);
     }
+
+    public function searchlog()
+    {
+        $userlogmod = new UserlogModel();
+        if($this->request->getVar('user')){$userlogmod->where('userid', $this->request->getVar('user'));}
+        if($this->request->getVar('start')){$userlogmod->where('created_at >=', $this->request->getVar('start'));}
+        if($this->request->getVar('end')){$userlogmod->where('created_at <=', $this->request->getVar('end'));}
+        $userlogmod->orderBy('created_at', 'DESC');
+        $data = $userlogmod->get()->getResult();
+
+        return json_encode($data);
+    }
 }

@@ -26,6 +26,7 @@ $routes->group('user', static function ($routes) {
     $routes->post('delete', 'Users::delete');
     $routes->post('view', 'Users::view');
     $routes->get('getlog', 'Users::getlog');
+    $routes->post('searchlog', 'Users::searchlog');
 });
 
 $routes->group('ticket', static function ($routes) {
