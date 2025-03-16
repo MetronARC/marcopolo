@@ -78,6 +78,14 @@ class Parts extends BaseController
         return json_encode($data);
     }
 
+    public function getlog()
+    {
+        $partmod = new PartslogModel();
+        $data = $partmod->where('rma', $this->request->getVar('rma'))->get()->getResult();
+
+        return json_encode($data);
+    }
+
     public function search()
     {
         $partmod = new PartsModel();

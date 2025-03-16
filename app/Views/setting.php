@@ -81,26 +81,28 @@
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
-                <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="name" placeholder="">
-                    <label for="floatingInput">Full Name</label>
-                </div>
-                <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="email" placeholder="">
-                    <label for="floatingInput">Email Address</label>
-                </div>
-                <div class="form-floating">
-                    <select class="form-select" id="type" aria-label="">
-                        <option selected disabled>User Type</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
-                    </select>
-                    <label for="floatingSelect">Select Type</label>
-                </div>
+                <form id="insertuser">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="name" placeholder="">
+                        <label for="floatingInput">Full Name</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" id="email" placeholder="">
+                        <label for="floatingInput">Email Address</label>
+                    </div>
+                    <div class="form-floating">
+                        <select class="form-select" id="type" aria-label="">
+                            <option selected disabled>User Type</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>
+                        <label for="floatingSelect">Select Type</label>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary float-end">Submit</button>
+                <button type="button" class="btn btn-primary float-end" onclick="submituser()">Submit</button>
             </div>
         </div>
     </div>
@@ -158,10 +160,10 @@
                         user_id: id
                     },
                     success: function(resp) {
-                        let data = JSON.parse(resp);
+                        // let data = JSON.parse(resp);
                         Swal.fire({
                             title: "Success",
-                            text: `Delete user ${name} successfully`,
+                            text: `Delete user successfully`,
                             icon: "success",
                             confirmButtonColor: "#3085d6",
                             confirmButtonText: "Ok"
@@ -174,6 +176,31 @@
                 })
             }
         });
+    }
+
+    function submituser() {
+        let data = {
+            name: $('#name').val(),
+            email: $('#email').val(),
+            type: $('#type').val()
+        }
+
+        $.ajax({
+            url: '/user/create',
+            type: 'POST',
+            data: data,
+            success: function(resp) {
+                $('#addusermodal').modal('hide')
+                $('#addusermodal input').val("")
+                Swal.fire({
+                    title: "Success!",
+                    text: "Insert User Successfully!",
+                    icon: "success"
+                });
+                getdatauser()
+            }
+        })
+        console.log(data)
     }
 
     $(function() {

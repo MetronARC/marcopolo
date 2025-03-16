@@ -140,10 +140,20 @@ class Ticket extends BaseController
 
     public function unfinish_engineer()
     {
+        $status = [
+            'CHECKING', 
+            'WAIT FOR PART',
+            'WAIT FOR DATA',
+            'WAIT FOR PASSWORD',
+            'WAIT FOR PRICE',
+            'WAIT FOR PREPLACEMENT',
+            'WAIT FOR UNIT',
+            'WAIT FOR ESCALATION',
+        ];
         $ticketmod = new TicketModel();
         $ticketmod->orderBy('created_at', 'DESC');
         $ticketmod->where('engineer', $this->request->getVar('user'));
-        $ticketmod->whereIn('ticket_status', ['CHECKING', 'WAIT FOR PART']);
+        $ticketmod->whereIn('ticket_status', $status);
         $data = $ticketmod->get()->getResult();
 
         return json_encode($data);
