@@ -46,6 +46,7 @@ $routes->group('parts', static function ($routes) {
     $routes->post('use', 'Parts::use', ['filter' => 'authGuard']);
     $routes->post('search', 'Parts::search', ['filter' => 'authGuard']);
     $routes->post('cancel', 'Parts::cancel', ['filter' => 'authGuard']);
+    $routes->post('get', 'Parts::get', ['filter' => 'authGuard']);
 });
 
 $routes->group('brand', static function ($routes) {

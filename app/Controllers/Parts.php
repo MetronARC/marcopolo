@@ -70,6 +70,14 @@ class Parts extends BaseController
         return $this->respond(['message' => 'Update sparepart successfully!'], 200);
     }
 
+    public function get()
+    {
+        $partmod = new PartsModel();
+        $data = $partmod->where('rma', $this->request->getVar('rma'))->get()->getResult();
+
+        return json_encode($data);
+    }
+
     public function search()
     {
         $partmod = new PartsModel();
