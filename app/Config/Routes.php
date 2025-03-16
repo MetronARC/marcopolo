@@ -45,7 +45,7 @@ $routes->group('ticket', static function ($routes) {
     $routes->get('stat', 'Ticket::stat', ['filter' => 'authGuard']);
     $routes->get('stat_device', 'Ticket::stat_device', ['filter' => 'authGuard']);
     $routes->post('stat_engineer', 'Ticket::stat_engineer', ['filter' => 'authGuard']);
-    $routes->get('ticketprint', 'Ticket::ticketprint', ['filter' => 'authGuard']);
+    $routes->get('ticketprint/(:segment)', 'Ticket::ticketprint/$1', ['filter' => 'authGuard']);
 });
 
 $routes->group('parts', static function ($routes) {
