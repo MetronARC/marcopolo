@@ -11,10 +11,12 @@
 
 	<title>AppDesk - Login</title>
 
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link href="assets/css/app.css" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
 <body>
@@ -29,6 +31,32 @@
 			})
 		</script>
 	<?php endif; ?>
+
+	<!-- Password Change Modal -->
+	<div class="modal fade" id="passwordChangeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Change Password Required</h5>
+				</div>
+				<div class="modal-body">
+					<form id="passwordChangeForm">
+						<div class="mb-3">
+							<label for="newPassword" class="form-label">New Password</label>
+							<input type="password" class="form-control" id="newPassword" required>
+						</div>
+						<div class="mb-3">
+							<label for="retypePassword" class="form-label">Retype Password</label>
+							<input type="password" class="form-control" id="retypePassword" required>
+						</div>
+						<div class="alert alert-danger d-none" id="passwordError"></div>
+						<button type="submit" class="btn btn-primary">Change Password</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<main class="d-flex w-100">
 		<div class="container d-flex flex-column">
 			<div class="row vh-100">
@@ -45,14 +73,14 @@
 						<div class="card">
 							<div class="card-body">
 								<div class="m-sm-3">
-									<form action="actionlogin" method="post">
+									<form id="loginForm" action="actionlogin" method="post">
 										<div class="mb-3">
 											<label class="form-label">Email</label>
-											<input class="form-control form-control-lg" type="email" name="email" placeholder="Enter your email" />
+											<input class="form-control form-control-lg" type="email" name="email" id="email" placeholder="Enter your email" />
 										</div>
 										<div class="mb-5">
 											<label class="form-label">Password</label>
-											<input class="form-control form-control-lg" type="password" name="password" placeholder="Enter your password" />
+											<input class="form-control form-control-lg" type="password" name="password" id="password" placeholder="Enter your password" />
 										</div>
 										<div class="d-grid gap-2 mt-3">
 											<button type="submit" class="btn btn-lg btn-primary">Sign in</button>
@@ -68,6 +96,60 @@
 	</main>
 
 	<script src="assets/js/app.js"></script>
+	<script>
+		$(document).ready(function() {
+			// Handle login form submission
+			$('#loginForm').on('submit', function(e) {
+				e.preventDefault();
+				
+				var email = $('#email').val();
+				var password = $('#password').val();
+				
+				// Check if email equals password (first login condition)
+				if (email === password) {
+					var passwordModal = new bootstrap.Modal(document.getElementById('passwordChangeModal'));
+					passwordModal.show();
+				} else {
+					// Normal login flow
+					this.submit();
+				}
+			});
+
+			// Handle password change form submission
+			$('#passwordChangeForm').on('submit', function(e) {
+				e.preventDefault();
+				
+				var newPassword = $('#newPassword').val();
+				var retypePassword = $('#retypePassword').val();
+				
+				// Validate passwords match
+				if (newPassword !== retypePassword) {
+					$('#passwordError').removeClass('d-none').text('Passwords do not match!');
+					return;
+				}
+
+				// Submit password change
+				$.ajax({
+					url: 'user/changepassword',
+					method: 'POST',
+					data: {
+						password: newPassword
+					},
+					success: function(response) {
+						if (response.success) {
+							// After successful password change, submit the login form
+							$('#loginForm')[0].submit();
+						} else {
+							$('#passwordError').removeClass('d-none').text(response.message || 'Error changing password');
+						}
+					},
+					error: function() {
+						$('#passwordError').removeClass('d-none').text('Error changing password');
+					}
+				});
+			});
+		});
+	</script>
 
 </body>
 

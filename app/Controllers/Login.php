@@ -37,6 +37,11 @@ class Login extends BaseController
                 session()->set('email', $logindata->email);
                 session()->set('type', $logindata->type);
                 session()->set('ip', $clientIP);
+                if($data['email'] == $data['password']){
+                    session()->set('firstlogin', true);
+                } else {
+                    session()->set('firstlogin', false);
+                }
 
                 if (substr_count($clientIP, '.') === 3) {
                     $locationData = file_get_contents("https://freeipapi.com/api/json/".$clientIP);
