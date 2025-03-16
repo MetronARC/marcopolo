@@ -109,7 +109,7 @@ class Ticket extends BaseController
 
             $ticketlog = [
                 'rma' => $this->request->getVar('rma'),
-                'note' => 'Checking request',
+                'note' => $this->request->getVar('note'),
                 'user' => $this->request->getVar('user'),
                 'created_at' => date('Y-m-d H:i:s')
             ];

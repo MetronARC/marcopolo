@@ -81,7 +81,9 @@ helper('auth');
                         </div>
                         <div class="col-md-4">
                             <label for="brand" class="form-label">Brand</label>
-                            <input type="text" class="form-control" id="brand" name="brand" required>
+                            <select class="form-select" id="brand" name="brand" required>
+                                <option value="">Select Brand</option>
+                            </select>
                         </div>
                         <div class="col-md-4">
                             <label for="type" class="form-label">Type</label>
@@ -89,11 +91,15 @@ helper('auth');
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <label for="service_no" class="form-label">Service Number</label>
+                            <input type="text" class="form-control" id="service_no" name="service_no" required>
+                        </div>
+                        <div class="col-md-4">
                             <label for="sn" class="form-label">Serial Number</label>
                             <input type="text" class="form-control" id="sn" name="sn" required>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="warranty" class="form-label">Warranty</label>
                             <select class="form-select" id="warranty" name="warranty" required>
                                 <option value="Yes">Yes</option>
@@ -148,7 +154,7 @@ helper('auth');
             <form id="updateTicketForm">
                 <div class="modal-body">
                     <input type="hidden" id="update_rma" name="rma">
-                    <input type="hidden" id="update_user" name="user" value="<?= session()->get('username') ?>">
+                    <input type="hidden" id="update_user" name="user" value="<?= session('name') ?>">
                     
                     <div class="mb-3">
                         <label for="ticket_status" class="form-label">Status</label>
@@ -280,8 +286,9 @@ helper('auth');
     document.addEventListener('DOMContentLoaded', async function() {
         try {
             await loadTickets();
+            await loadBrands();
         } catch (error) {
-            console.error('Failed to load tickets:', error);
+            console.error('Failed to load initial data:', error);
         }
 
         // Handle status change to show/hide payment details
@@ -385,6 +392,33 @@ helper('auth');
             });
         }
     });
+
+    // Function to load brands from the API
+    async function loadBrands() {
+        try {
+            const response = await fetch('/brand/get');
+            const data = await response.json();
+            console.log('Brand Data:', data);
+            
+            const brandSelect = document.getElementById('brand');
+            // Keep the first "Select Brand" option
+            brandSelect.innerHTML = '<option value="">Select Brand</option>';
+            
+            data.forEach(brand => {
+                const option = document.createElement('option');
+                option.value = brand.brand;
+                option.textContent = brand.brand;
+                brandSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading brands:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Failed to load brands. Please refresh the page.',
+            });
+        }
+    }
 </script>
 
 <?= $this->endSection() ?>

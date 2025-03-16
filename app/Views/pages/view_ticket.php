@@ -31,6 +31,7 @@ helper('auth');
                         <option value="WAIT FOR REPLACEMENT">WAIT FOR REPLACEMENT</option>
                         <option value="WAIT FOR UNIT">WAIT FOR UNIT</option>
                         <option value="WAIT FOR ESCALATION">WAIT FOR ESCALATION</option>
+                        <option value="WAIT FOR PICKUP">WAIT FOR PICKUP</option>
                     </select>
                 </div>
                 <div class="mb-3">
