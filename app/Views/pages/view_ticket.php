@@ -169,6 +169,7 @@ helper('auth');
             </div>
             <div class="modal-body">
                 <input type="hidden" id="usePartId">
+                <input type="hidden" id="usePartName">
                 <div class="mb-3">
                     <label for="usePartNote" class="form-label">Note</label>
                     <textarea class="form-control" id="usePartNote" rows="3"></textarea>
@@ -192,6 +193,7 @@ helper('auth');
             </div>
             <div class="modal-body">
                 <input type="hidden" id="cancelPartId">
+                <input type="hidden" id="cancelPartName">
                 <div class="mb-3">
                     <label for="cancelPartNote" class="form-label">Note</label>
                     <textarea class="form-control" id="cancelPartNote" rows="3"></textarea>
@@ -431,10 +433,14 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <td>${part.type || '-'}</td>
                                         <td class="text-center">
                                             <div class="btn-group" role="group">
-                                                <button class="btn btn-success btn-sm use-part-btn" data-part-id="${part.part_id}">
+                                                <button class="btn btn-success btn-sm use-part-btn" 
+                                                    data-part-id="${part.part_id}"
+                                                    data-part-name="${part.name || '-'}">
                                                     Use
                                                 </button>
-                                                <button class="btn btn-danger btn-sm cancel-part-btn" data-part-id="${part.part_id}">
+                                                <button class="btn btn-danger btn-sm cancel-part-btn" 
+                                                    data-part-id="${part.part_id}"
+                                                    data-part-name="${part.name || '-'}">
                                                     Cancel
                                                 </button>
                                             </div>
@@ -452,7 +458,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelectorAll('.use-part-btn').forEach(button => {
                     button.addEventListener('click', function() {
                         const partId = this.getAttribute('data-part-id');
+                        const partName = this.getAttribute('data-part-name');
                         document.getElementById('usePartId').value = partId;
+                        document.getElementById('usePartName').value = partName;
                         const modal = new bootstrap.Modal(document.getElementById('usePartModal'));
                         modal.show();
                     });
@@ -462,7 +470,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelectorAll('.cancel-part-btn').forEach(button => {
                     button.addEventListener('click', function() {
                         const partId = this.getAttribute('data-part-id');
+                        const partName = this.getAttribute('data-part-name');
                         document.getElementById('cancelPartId').value = partId;
+                        document.getElementById('cancelPartName').value = partName;
                         const modal = new bootstrap.Modal(document.getElementById('cancelPartModal'));
                         modal.show();
                     });
@@ -534,6 +544,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle Use Part confirmation
     document.getElementById('confirmUsePart').addEventListener('click', function() {
         const partId = document.getElementById('usePartId').value;
+        const partName = document.getElementById('usePartName').value;
         const note = document.getElementById('usePartNote').value;
 
         if (!note) {
@@ -549,6 +560,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify({
                 part_id: partId,
+                part_name: partName,
                 rma: rma,
                 engineer: username,
                 note: note
@@ -572,6 +584,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle Cancel Part confirmation
     document.getElementById('confirmCancelPart').addEventListener('click', function() {
         const partId = document.getElementById('cancelPartId').value;
+        const partName = document.getElementById('cancelPartName').value;
         const note = document.getElementById('cancelPartNote').value;
 
         if (!note) {
@@ -598,6 +611,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     body: JSON.stringify({
                         part_id: partId,
+                        part_name: partName,
                         rma: rma,
                         engineer: username,
                         note: note
