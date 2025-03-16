@@ -20,6 +20,7 @@ class Ticket extends BaseController
             'customer_address' => $this->request->getVar('customer_address'),
             'customer_phone' => $this->request->getVar('customer_phone'),
             'customer_email' => $this->request->getVar('customer_email'),
+            'service_no' => $this->request->getVar('service_no'),
             'device' => $this->request->getVar('device'),
             'brand' => $this->request->getVar('brand'),
             'type' => $this->request->getVar('type'),
@@ -125,6 +126,14 @@ class Ticket extends BaseController
     {
         $ticketmod = new TicketModel();
         $data = $ticketmod->orderBy('created_at', 'DESC')->where('ticket_status', 'CHECKING')->get()->getResult();
+
+        return json_encode($data);
+    }
+
+    public function unfinish_part()
+    {
+        $ticketmod = new TicketModel();
+        $data = $ticketmod->orderBy('created_at', 'DESC')->where('ticket_status', 'WAIT FOR PART')->get()->getResult();
 
         return json_encode($data);
     }

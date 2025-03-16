@@ -36,7 +36,7 @@
             </li>
 
             <li class="sidebar-item">
-              <a class="sidebar-link" href="<?= base_url('/') ?>">
+              <a class="sidebar-link" href="<?= base_url('setting') ?>">
                 <i class="align-middle" data-feather="settings"></i>
                 <span class="align-middle">Settings</span>
               </a>

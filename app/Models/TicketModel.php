@@ -15,6 +15,7 @@ class TicketModel extends Model
     protected $allowedFields    = [
         'id',
         'rma',
+        'service_no',
         'customer_name',
         'customer_address',
         'customer_phone',

@@ -18,7 +18,7 @@ class Users extends BaseController
             'user_id'       => $this->createid(),
             'name'          => $this->request->getVar('name'),
             'email'         => $this->request->getVar('email'),
-            'password'      => password_hash($this->request->getVar('password'), PASSWORD_DEFAULT),
+            'password'      => password_hash($this->request->getVar('email'), PASSWORD_DEFAULT),
             'type'          => $this->request->getVar('type'),
             'created_at'    => date('Y-m-d H:i:s')
         ];
@@ -90,5 +90,12 @@ class Users extends BaseController
             $newid = 'U' . date('y') . sprintf("%04d", 1); 
             return $newid;
         }
+    }
+
+    public function getall()
+    {
+        $usermod = new UserModel();
+        $alldata = $usermod->findAll();
+        return json_encode($alldata);
     }
 }

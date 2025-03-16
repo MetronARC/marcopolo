@@ -15,6 +15,7 @@ class Ticket extends Migration
                 'auto_increment' => true
             ],
             'rma' => ['type' => 'VARCHAR', 'constraint' => 50],
+            'service_no' => ['type' => 'VARCHAR', 'constraint' => 50, 'null' => true],
             'customer_name' => ['type' => 'VARCHAR', 'constraint' => 255],
             'customer_address' => ['type' => 'TEXT'],
             'customer_phone' => ['type' => 'VARCHAR', 'constraint' => 20],
