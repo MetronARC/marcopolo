@@ -20,7 +20,7 @@
                 Email : test@admin.com
             </div>
         </div><hr>
-        <div class="row">
+        <div class="row mb-2">
             <div class="col-8 text-center">
                 <b>Tanda Terima Service</b>
             </div>
@@ -30,10 +30,81 @@
                         Tanggal<br>Nomor
                     </div>
                     <div class="col-7">
-                        :<br>:
+                        <?= date('d F Y') ?><br>T240101011
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-6">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td style="width: 30%;">Nama</td>
+                            <td>: biji</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 30%;">Alamat</td>
+                            <td>: jalan biji meledak no. 5</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 30%;">Telepon</td>
+                            <td>: 081289898989</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 30%;">Brand</td>
+                            <td>: ASUS</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 30%;">Type</td>
+                            <td>: HAHA2525</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 30%;">SN</td>
+                            <td>: ASD89Q5G</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 30%;">Warranty</td>
+                            <td>: <b>Not Warranty</b> / Warranty until</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-6">
+            <table>
+                    <tbody>
+                        <tr>
+                            <td style="width: 30%;">Kondisi</td>
+                            <td>: black screen, lcd retak</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 30%;">Problem</td>
+                            <td>: biji meledak</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 30%;">Detail Problem</td>
+                            <td>: biji nya meledak tiba tiba</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 30%;">Aksesoris</td>
+                            <td>: SD Card</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 30%;">Engineer</td>
+                            <td>: YUDISTA RAHADIAN</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3 text-center">
+                CS<br><br><br><br><?= session('name') ?>
+            </div>
+            <div class="col-3 text-center">
+                Customer<br><br><br><br>Halimah
+            </div>
+            <div class="col-6"></div>
         </div>
     </div>
 </body>

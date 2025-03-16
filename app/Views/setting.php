@@ -126,7 +126,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary float-end" onclick="submituser()">Submit</button>
+                <button type="button" class="btn btn-primary float-end" id="submituserbtn" onclick="submituser()" disable>Submit</button>
             </div>
         </div>
     </div>
@@ -527,6 +527,31 @@
             getdatalog()
             $('#carduser, #cardbrand').hide()
             $('#cardlog').show()
+        })
+        $('#email').on('keyup', function() {
+            let email = $(this).val();
+            $.ajax({
+                url: '/user/validation',
+                type: 'POST',
+                data: {
+                    email: email
+                },
+                success: function(resp) {
+                    console.log(resp)
+                    if (resp == 'true') {
+                        $('#email').addClass('is-valid').removeClass('is-invalid')
+                        $('#submituserbtn').prop('disabled', false);
+                    } else {
+                        $('#email').addClass('is-invalid').removeClass('is-valid')
+                        $('#submituserbtn').prop('disabled', true);
+                        Swal.fire({
+                            title: "Oops!",
+                            text: "Email already registered!",
+                            icon: "error"
+                        });
+                    }
+                }
+            })
         })
     })
 </script>
