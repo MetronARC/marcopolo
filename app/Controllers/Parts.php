@@ -7,6 +7,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\API\ResponseTrait;
 use App\Models\PartsModel;
 use App\Models\PartslogModel;
+use App\Models\TicketlogModel;
 
 class Parts extends BaseController
 {
@@ -41,6 +42,16 @@ class Parts extends BaseController
         $partmod = new PartsModel();
         $partmod->set($data)->where('part_id', $this->request->getVar('part_id'))->update();
 
+        $ticketlog = [
+            'rma' => $this->request->getVar('rma'),
+            'note' => $this->request->getVar('note'),
+            'user' => $this->request->getVar('user'),
+            'created_at' => date('Y-m-d H:i:s')
+        ];
+
+        $ticketlogmod = new TicketlogModel();
+        $ticketlogmod->save($ticketlog);
+
         return $this->respond(['message' => 'Assign sparepart successfully!'], 200);
     }
 
@@ -66,6 +77,16 @@ class Parts extends BaseController
 
         $partlogmod = new PartslogModel();
         $partlogmod->save($log);
+
+        $ticketlog = [
+            'rma' => $this->request->getVar('rma'),
+            'note' => $this->request->getVar('note'),
+            'user' => $this->request->getVar('engineer'),
+            'created_at' => date('Y-m-d H:i:s')
+        ];
+
+        $ticketlogmod = new TicketlogModel();
+        $ticketlogmod->save($ticketlog);
 
         return $this->respond(['message' => 'Update sparepart successfully!'], 200);
     }

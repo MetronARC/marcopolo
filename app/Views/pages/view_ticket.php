@@ -6,7 +6,44 @@ helper('auth');
 <?= $this->section('page-content') ?>
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h3 mb-0"><strong>Ticket</strong> Details</h1>
-    <a href="/engineer" class="btn btn-secondary">Back to List</a>
+    <div>
+        <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#updateTicketModal">Update Ticket</button>
+        <a href="/engineer" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>
+
+<!-- Update Ticket Modal -->
+<div class="modal fade" id="updateTicketModal" tabindex="-1" aria-labelledby="updateTicketModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateTicketModalLabel">Update Ticket Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="ticketStatus" class="form-label">Select Status</label>
+                    <select class="form-select" id="ticketStatus">
+                        <option value="WAIT FOR PART">WAIT FOR PART</option>
+                        <option value="WAIT FOR DATA">WAIT FOR DATA</option>
+                        <option value="WAIT FOR PASSWORD">WAIT FOR PASSWORD</option>
+                        <option value="WAIT FOR PRICE">WAIT FOR PRICE</option>
+                        <option value="WAIT FOR REPLACEMENT">WAIT FOR REPLACEMENT</option>
+                        <option value="WAIT FOR UNIT">WAIT FOR UNIT</option>
+                        <option value="WAIT FOR ESCALATION">WAIT FOR ESCALATION</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="ticketNote" class="form-label">Note</label>
+                    <textarea class="form-control" id="ticketNote" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="updateTicketBtn">Update</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row">
@@ -82,17 +119,38 @@ helper('auth');
         </div>
     </div>
 
-    <!-- Ticket Logs Card -->
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Ticket History</h5>
+    <!-- History Section -->
+    <div class="row">
+        <!-- Ticket History Card -->
+        <div class="col-12 col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Ticket History</h5>
+                </div>
+                <div class="card-body">
+                    <div id="ticket-logs">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <div id="ticket-logs">
-                    <div class="text-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+        </div>
+
+        <!-- Parts History Card -->
+        <div class="col-12 col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Parts History</h5>
+                </div>
+                <div class="card-body">
+                    <div id="parts-logs">
+                        <div class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -127,6 +185,7 @@ function formatDate(dateString) {
 
 document.addEventListener('DOMContentLoaded', function() {
     const rma = '<?= session('view_ticket_rma') ?>';
+    const username = '<?= session('name') ?>';
 
     if (rma) {
         fetch(`/ticket/view`, {
@@ -278,6 +337,67 @@ document.addEventListener('DOMContentLoaded', function() {
                     ${logsHtml}
                 </div>
             `;
+
+            // Fetch parts history
+            fetch('/parts/getlog', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    rma: rma
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Parts History:');
+                console.log(JSON.stringify(data, null, 2));
+
+                const partsLogsHtml = data.map(log => `
+                    <div class="timeline-item">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <small class="text-muted">${formatDate(log.created_at)}</small>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="fw-bold">${log.user}</span>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-2">Part: ${log.part_name || '-'}</p>
+                                <p class="mb-2">Action: ${log.action || '-'}</p>
+                                <p class="mb-2">Note: ${log.note || '-'}</p>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+                `).join('');
+
+                document.getElementById('parts-logs').innerHTML = `
+                    <div class="timeline">
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <span class="text-muted">Date & Time</span>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="text-muted">User</span>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="text-muted">Details</span>
+                            </div>
+                        </div>
+                        ${partsLogsHtml || '<div class="text-center">No parts history found</div>'}
+                    </div>
+                `;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('parts-logs').innerHTML = `
+                    <div class="alert alert-danger">
+                        Error loading parts history
+                    </div>
+                `;
+            });
         })
         .catch(error => {
             console.error('Error:', error);
@@ -294,6 +414,44 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
     }
+
+    // Add event listener for update ticket button
+    document.getElementById('updateTicketBtn').addEventListener('click', function() {
+        const status = document.getElementById('ticketStatus').value;
+        const note = document.getElementById('ticketNote').value;
+
+        if (!status || !note) {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        fetch('/ticket/update/engineer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+                rma: rma,
+                ticket_status: status,
+                note: note,
+                user: username
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Close the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('updateTicketModal'));
+            modal.hide();
+            
+            // Reload the page to show updated status
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error updating ticket');
+        });
+    });
 });
 </script>
 
