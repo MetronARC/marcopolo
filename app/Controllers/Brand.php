@@ -11,6 +11,14 @@ class Brand extends BaseController
 {
     use ResponseTrait;
 
+    public function get()
+    {
+        $brandmod = new BrandModel();
+        $brand = $brandmod->findAll();
+
+        return json_encode($brand);
+    }
+
     public function insert()
     {
         $data = [

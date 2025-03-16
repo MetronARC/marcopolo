@@ -49,6 +49,7 @@ $routes->group('parts', static function ($routes) {
 });
 
 $routes->group('brand', static function ($routes) {
+    $routes->get('get', 'Brand::get', ['filter' => 'authGuard']);
     $routes->post('insert', 'Brand::insert', ['filter' => 'authGuard']);
     $routes->post('update', 'Brand::update', ['filter' => 'authGuard']);
     $routes->post('delete', 'Brand::delete', ['filter' => 'authGuard']);
