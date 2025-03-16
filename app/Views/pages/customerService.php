@@ -43,7 +43,6 @@ helper('auth');
     </div>
 </div>
 
-<!-- Register Ticket Modal -->
 <div class="modal fade" id="registerTicketModal" tabindex="-1" aria-labelledby="registerTicketModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -143,7 +142,6 @@ helper('auth');
     </div>
 </div>
 
-<!-- Update Ticket Modal -->
 <div class="modal fade" id="updateTicketModal" tabindex="-1" aria-labelledby="updateTicketModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -170,7 +168,6 @@ helper('auth');
                         <textarea class="form-control" id="note" name="note" rows="3" required></textarea>
                     </div>
 
-                    <!-- Payment details (initially hidden) -->
                     <div id="paymentDetails" style="display: none;">
                         <div class="mb-3">
                             <label for="payment" class="form-label">Payment Method</label>
@@ -291,23 +288,19 @@ helper('auth');
             console.error('Failed to load initial data:', error);
         }
 
-        // Handle status change to show/hide payment details
         document.getElementById('ticket_status').addEventListener('change', function() {
             const paymentDetails = document.getElementById('paymentDetails');
             if (this.value === 'FINISHED') {
                 paymentDetails.style.display = 'block';
-                // Make payment fields required
                 document.getElementById('payment').required = true;
                 document.getElementById('payment_amount').required = true;
             } else {
                 paymentDetails.style.display = 'none';
-                // Remove required attribute when hidden
                 document.getElementById('payment').required = false;
                 document.getElementById('payment_amount').required = false;
             }
         });
 
-        // Handle Update Ticket button click
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('update-ticket-btn')) {
                 const rma = e.target.getAttribute('data-rma');
@@ -315,7 +308,6 @@ helper('auth');
             }
         });
 
-        // Handle Update Ticket form submission
         document.getElementById('updateTicketForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -393,7 +385,6 @@ helper('auth');
         }
     });
 
-    // Function to load brands from the API
     async function loadBrands() {
         try {
             const response = await fetch('/brand/get');
@@ -401,7 +392,6 @@ helper('auth');
             console.log('Brand Data:', data);
             
             const brandSelect = document.getElementById('brand');
-            // Keep the first "Select Brand" option
             brandSelect.innerHTML = '<option value="">Select Brand</option>';
             
             data.forEach(brand => {

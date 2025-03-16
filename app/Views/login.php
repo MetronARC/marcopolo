@@ -100,40 +100,37 @@
 		$(document).ready(function() {
 			var userId = null;
 
-			// Handle login form submission
 			$('#loginForm').on('submit', function(e) {
 				e.preventDefault();
 				
 				var email = $('#email').val();
 				var password = $('#password').val();
 				
-				// Check if email equals password
-				if (email === password) {
-					// Try to login with the actual credentials
-					$.ajax({
-						url: 'actionlogin',
-						method: 'POST',
-						data: {
-							email: email,
-							password: password
-						},
-						success: function(response) {
-							// Show the password change modal if login was successful
-							var passwordModal = new bootstrap.Modal(document.getElementById('passwordChangeModal'));
-							passwordModal.show();
-						},
-						error: function() {
-							// If login failed, submit form normally to show the error
+				$.ajax({
+					url: 'actionlogin',
+					method: 'POST',
+					data: {
+						email: email,
+						password: password
+					},
+					success: function(response) {
+						if (response.indexOf('login') !== -1) {
 							$('#loginForm')[0].submit();
+						} else {
+							if (email === password) {
+								var passwordModal = new bootstrap.Modal(document.getElementById('passwordChangeModal'));
+								passwordModal.show();
+							} else {
+								window.location.href = '/';
+							}
 						}
-					});
-				} else {
-					// Normal login flow
-					this.submit();
-				}
+					},
+					error: function() {
+						$('#loginForm')[0].submit();
+					}
+				});
 			});
 
-			// Handle password change form submission
 			$('#passwordChangeForm').on('submit', function(e) {
 				e.preventDefault();
 				
@@ -141,29 +138,27 @@
 				var retypePassword = $('#retypePassword').val();
 				var email = $('#email').val();
 				
-				// Validate passwords match
 				if (newPassword !== retypePassword) {
 					$('#passwordError').removeClass('d-none').text('Passwords do not match!');
 					return;
 				}
 
-				// Validate new password is not the same as email
 				if (newPassword === email) {
 					$('#passwordError').removeClass('d-none').text('New password cannot be the same as your email!');
 					return;
 				}
 
-				// Submit password change
 				$.ajax({
 					url: 'user/changepassword',
 					method: 'POST',
-					data: {
+					dataType: 'json',
+					contentType: 'application/json',
+					data: JSON.stringify({
 						newpassword: newPassword,
 						user_id: '<?= session()->get('userid') ?>'
-					},
+					}),
 					success: function(response) {
 						if (response.message === 'Change password successfully!') {
-							// Show success message and redirect to login
 							Swal.fire({
 								title: "Success!",
 								text: "Password changed successfully. Please login with your new password.",
@@ -175,11 +170,39 @@
 							$('#passwordError').removeClass('d-none').text(response.message || 'Error changing password');
 						}
 					},
-					error: function() {
-						$('#passwordError').removeClass('d-none').text('Error changing password');
+					error: function(xhr) {
+						var errorMessage = 'Error changing password';
+						if (xhr.responseJSON && xhr.responseJSON.message) {
+							errorMessage = xhr.responseJSON.message;
+						}
+						$('#passwordError').removeClass('d-none').text(errorMessage);
 					}
 				});
 			});
+
+			function validatePasswords() {
+				var newPassword = $('#newPassword').val();
+				var retypePassword = $('#retypePassword').val();
+				var email = $('#email').val();
+
+				if (newPassword || retypePassword) {
+					if (newPassword !== retypePassword) {
+						$('#passwordError').removeClass('d-none').text('Passwords do not match!');
+						return false;
+					} else if (newPassword === email) {
+						$('#passwordError').removeClass('d-none').text('New password cannot be the same as your email!');
+						return false;
+					} else {
+						$('#passwordError').addClass('d-none').text('');
+						return true;
+					}
+				} else {
+					$('#passwordError').addClass('d-none').text('');
+					return false;
+				}
+			}
+
+			$('#newPassword, #retypePassword').on('input', validatePasswords);
 		});
 	</script>
 

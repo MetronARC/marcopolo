@@ -152,4 +152,15 @@ class Users extends BaseController
 
         return json_encode($data);
     }
+
+    public function validation()
+    {
+        $usermod = new UserModel();
+        $data = $usermod->where('email', $this->request->getVar('email'))->get()->getResult();
+        if($data){
+            return 'false';
+        } else {
+            return 'true';
+        }
+    }
 }

@@ -68,7 +68,7 @@ class Login extends BaseController
                 return redirect()->to('/');
             }
         } else {
-            session()->setFlashdata('error', 'Account not found!');
+            session()->setFlashdata('error', 'Incorrect username or password, please try again !');
             return redirect()->to('login');
         }
     }
