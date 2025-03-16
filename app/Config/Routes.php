@@ -34,6 +34,7 @@ $routes->group('ticket', static function ($routes) {
     $routes->get('unfinish/engineer', 'Ticket::unfinish_engineer', ['filter' => 'authGuard']);
     $routes->post('unfinish/cs', 'Ticket::unfinish_cs', ['filter' => 'authGuard']);
     $routes->post('unfinish/checking', 'Ticket::unfinish_checking', ['filter' => 'authGuard']);
+    $routes->get('unfinish/part', 'Ticket::unfinish_part', ['filter' => 'authGuard']);
     $routes->post('view', 'Ticket::view', ['filter' => 'authGuard']);
     $routes->get('stat', 'Ticket::stat', ['filter' => 'authGuard']);
     $routes->get('stat_device', 'Ticket::stat_device', ['filter' => 'authGuard']);
