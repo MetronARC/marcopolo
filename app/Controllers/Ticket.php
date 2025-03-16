@@ -7,6 +7,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\API\ResponseTrait;
 use App\Models\TicketModel;
 use App\Models\TicketlogModel;
+use App\Models\UserlogModel;
 
 class Ticket extends BaseController
 {
@@ -49,6 +50,17 @@ class Ticket extends BaseController
         $ticketlogmod = new TicketlogModel();
         $ticketlogmod->save($ticketlog);
 
+        $logmod = new UserlogModel();
+        $log = [
+            'userid'         => session('userid'),
+            'email'          => session('email'),
+            'name'           => session('name'),
+            'action'         => '/ticket/create',
+            'created_at'     => date('Y-m-d H:i:s'),
+            'description'    => json_encode($data),
+        ];
+        $logmod->insert($log);
+
         return $this->respond(['message' => 'Create ticket successfully!'], 200);
     }
 
@@ -70,6 +82,17 @@ class Ticket extends BaseController
 
         $ticketlogmod = new TicketlogModel();
         $ticketlogmod->save($ticketlog);
+
+        $logmod = new UserlogModel();
+        $log = [
+            'userid'         => session('userid'),
+            'email'          => session('email'),
+            'name'           => session('name'),
+            'action'         => '/ticket/update/engineer',
+            'created_at'     => date('Y-m-d H:i:s'),
+            'description'    => json_encode($data),
+        ];
+        $logmod->insert($log);
 
         return $this->respond(['message' => 'Update ticket successfully!'], 200);
     }
@@ -93,6 +116,17 @@ class Ticket extends BaseController
     
             $ticketlogmod = new TicketlogModel();
             $ticketlogmod->save($ticketlog);
+
+            $logmod = new UserlogModel();
+            $log = [
+                'userid'         => session('userid'),
+                'email'          => session('email'),
+                'name'           => session('name'),
+                'action'         => '/ticket/update/cs',
+                'created_at'     => date('Y-m-d H:i:s'),
+                'description'    => json_encode($ticketlog),
+            ];
+            $logmod->insert($log);
     
             return $this->respond(['message' => 'Update ticket successfully!'], 200);
         } else {
@@ -117,6 +151,17 @@ class Ticket extends BaseController
     
             $ticketlogmod = new TicketlogModel();
             $ticketlogmod->save($ticketlog);
+
+            $logmod = new UserlogModel();
+            $log = [
+                'userid'         => session('userid'),
+                'email'          => session('email'),
+                'name'           => session('name'),
+                'action'         => '/ticket/update/cs',
+                'created_at'     => date('Y-m-d H:i:s'),
+                'description'    => json_encode($ticketlog),
+            ];
+            $logmod->insert($log);
     
             return $this->respond(['message' => 'Update ticket successfully!'], 200);
         }

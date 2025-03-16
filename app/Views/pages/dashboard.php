@@ -224,7 +224,7 @@
     }
 
     function updateLatestTickets() {
-        fetch('/ticket/unfinish/checkin', {
+        fetch('/ticket/unfinish/checking', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

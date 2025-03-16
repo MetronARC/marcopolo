@@ -26,6 +26,7 @@ helper('auth');
                         <th class="d-none d-xl-table-cell">End Date</th>
                         <th>Status</th>
                         <th class="d-none d-md-table-cell">Engineer</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="ticketTableBody">
@@ -136,6 +137,69 @@ helper('auth');
     </div>
 </div>
 
+<!-- Update Ticket Modal -->
+<div class="modal fade" id="updateTicketModal" tabindex="-1" aria-labelledby="updateTicketModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateTicketModalLabel">Update Ticket</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="updateTicketForm">
+                <div class="modal-body">
+                    <input type="hidden" id="update_rma" name="rma">
+                    <input type="hidden" id="update_user" name="user" value="<?= session()->get('username') ?>">
+                    
+                    <div class="mb-3">
+                        <label for="ticket_status" class="form-label">Status</label>
+                        <select class="form-select" id="ticket_status" name="ticket_status" required>
+                            <option value="">Select Status</option>
+                            <option value="CHECKING">CHECKING</option>
+                            <option value="FINISHED">FINISHED</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="note" class="form-label">Note</label>
+                        <textarea class="form-control" id="note" name="note" rows="3" required></textarea>
+                    </div>
+
+                    <!-- Payment details (initially hidden) -->
+                    <div id="paymentDetails" style="display: none;">
+                        <div class="mb-3">
+                            <label for="payment" class="form-label">Payment Method</label>
+                            <select class="form-select" id="payment" name="payment">
+                                <option value="TUNAI">TUNAI</option>
+                                <option value="Transfer">Transfer</option>
+                                <option value="QRIS">QRIS</option>
+                                <option value="Credit Card">Credit Card</option>
+                                <option value="Debit Card">Debit Card</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="payment_amount" class="form-label">Payment Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Rp</span>
+                                <input type="number" class="form-control" id="payment_amount" name="payment_amount">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="payment_note" class="form-label">Payment Note</label>
+                            <textarea class="form-control" id="payment_note" name="payment_note" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     function loadTickets() {
         return new Promise((resolve, reject) => {
@@ -167,6 +231,14 @@ helper('auth');
                         <td class="d-none d-xl-table-cell">${ticket.close_date ? formatDate(ticket.close_date) : '-'}</td>
                         <td><span class="badge bg-${getStatusColor(ticket.ticket_status)}">${ticket.ticket_status}</span></td>
                         <td class="d-none d-md-table-cell">${ticket.engineer || '-'}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-primary update-ticket-btn" 
+                                data-rma="${ticket.rma}"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#updateTicketModal">
+                                Update Ticket
+                            </button>
+                        </td>
                     `;
                             tableBody.appendChild(row);
                         });
@@ -211,6 +283,68 @@ helper('auth');
         } catch (error) {
             console.error('Failed to load tickets:', error);
         }
+
+        // Handle status change to show/hide payment details
+        document.getElementById('ticket_status').addEventListener('change', function() {
+            const paymentDetails = document.getElementById('paymentDetails');
+            if (this.value === 'FINISHED') {
+                paymentDetails.style.display = 'block';
+                // Make payment fields required
+                document.getElementById('payment').required = true;
+                document.getElementById('payment_amount').required = true;
+            } else {
+                paymentDetails.style.display = 'none';
+                // Remove required attribute when hidden
+                document.getElementById('payment').required = false;
+                document.getElementById('payment_amount').required = false;
+            }
+        });
+
+        // Handle Update Ticket button click
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('update-ticket-btn')) {
+                const rma = e.target.getAttribute('data-rma');
+                document.getElementById('update_rma').value = rma;
+            }
+        });
+
+        // Handle Update Ticket form submission
+        document.getElementById('updateTicketForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            try {
+                const response = await fetch('/ticket/update/cs', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.message) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: data.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('updateTicketModal'));
+                    modal.hide();
+                    this.reset();
+                    await loadTickets();
+                } else {
+                    throw new Error('No response message received');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'An error occurred while updating the ticket.',
+                });
+            }
+        });
     });
 
     document.getElementById('registerTicketForm').addEventListener('submit', async function(e) {
