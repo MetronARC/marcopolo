@@ -8,6 +8,7 @@ use CodeIgniter\API\ResponseTrait;
 use App\Models\TicketModel;
 use App\Models\TicketlogModel;
 use App\Models\UserlogModel;
+use App\Models\DeviceModel;
 
 class Ticket extends BaseController
 {
@@ -15,6 +16,18 @@ class Ticket extends BaseController
 
     public function create()
     {
+        if($this->request->getVar('new_device')){
+            $device = $this->request->getVar('new_device');
+            $devicemod = new DeviceModel();
+            $newdevice = [
+                'device'        => $device,
+                'created_at'    => date('Y-m-d H:i:s')
+            ];
+            $devicemod->save($newdevice);
+        } else {
+            $device = $this->request->getVar('device');
+        }
+
         $data = [
             'rma' => $this->createrma(),
             'customer_name' => $this->request->getVar('customer_name'),
@@ -22,7 +35,7 @@ class Ticket extends BaseController
             'customer_phone' => $this->request->getVar('customer_phone'),
             'customer_email' => $this->request->getVar('customer_email'),
             'service_no' => $this->request->getVar('service_no'),
-            'device' => $this->request->getVar('device'),
+            'device' => $device,
             'brand' => $this->request->getVar('brand'),
             'type' => $this->request->getVar('type'),
             'sn' => $this->request->getVar('sn'),
