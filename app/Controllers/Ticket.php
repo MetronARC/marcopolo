@@ -336,4 +336,11 @@ class Ticket extends BaseController
         ];
         return view('pages/ticketprint', $container);
     }
+
+    public function getdevice()
+    {
+        $devicemod = new DeviceModel();
+        $data = $devicemod->findAll();
+        return json_encode($data);
+    }
 }

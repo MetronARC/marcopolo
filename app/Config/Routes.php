@@ -65,6 +65,10 @@ $routes->group('brand', static function ($routes) {
     $routes->post('delete', 'Brand::delete', ['filter' => 'authGuard']);
 });
 
+$routes->group('device', static function ($routes) {
+    $routes->get('get', 'Ticket::getdevice', ['filter' => 'authGuard']);
+});
+
 $routes->group('setting', static function ($routes) {
     $routes->get('/', 'Setting::index', ['filter' => 'authGuard']);
 });
