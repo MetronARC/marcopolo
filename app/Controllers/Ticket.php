@@ -248,12 +248,14 @@ class Ticket extends BaseController
         $checking       = $ticketmod->orderBy('created_at', 'DESC')->where('ticket_status', 'CHECKING')->get()->getResult();
         $waitpart       = $ticketmod->orderBy('created_at', 'DESC')->where('ticket_status', 'WAIT FOR PART')->get()->getResult();
         $waitpickup     = $ticketmod->orderBy('created_at', 'DESC')->where('ticket_status', 'WAIT FOR PICKUP')->get()->getResult();
+        $escalation     = $ticketmod->orderBy('created_at', 'DESC')->where('ticket_status', 'WAIT FOR ESCALATION')->get()->getResult();
 
         $stat = [
             'new'           => count($checking),
             'checking'      => count($checking),
             'waitpart'      => count($waitpart),
             'waitpickup'    => count($waitpickup),
+            'escalation'    => count($escalation),
         ];
 
         return json_encode($stat);

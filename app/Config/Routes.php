@@ -5,6 +5,7 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
+// $routes->get('access/(:segment)', 'Login::access/$1');
 $routes->get('/', 'Home::index', ['filter' => 'authGuard']);
 $routes->get('logs', 'Logs::index');
 $routes->get('login', 'Login::login');
@@ -22,6 +23,7 @@ $routes->group('api', static function ($routes) {
 });
 
 $routes->group('user', static function ($routes) {
+    $routes->get('get/(:segment)', 'Users::get/$1');
     $routes->get('getall', 'Users::getall');
     $routes->post('create', 'Users::create');
     $routes->post('changepassword', 'Users::changepassword');

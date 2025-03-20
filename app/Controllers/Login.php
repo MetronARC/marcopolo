@@ -36,6 +36,7 @@ class Login extends BaseController
                 session()->set('name', $logindata->name);
                 session()->set('email', $logindata->email);
                 session()->set('type', $logindata->type);
+                session()->set('access', $this->access($logindata->type));
                 session()->set('ip', $clientIP);
                 if($data['email'] == $data['password']){
                     session()->set('firstlogin', true);
@@ -88,5 +89,71 @@ class Login extends BaseController
 
         session()->destroy();
         return redirect()->to('login');
+    }
+
+    public function access($type)
+    {
+        $menu = [
+            'dashboard' => [
+                'name'  => 'Dashboard',
+                'icon'  => 'layout',
+                'path'  => '/'
+            ],
+            'cs' => [
+                'name'  => 'Customer Service',
+                'icon'  => 'sliders',
+                'path'  => 'cs'
+            ],
+            'engineer' => [
+                'name'  => 'Engineer',
+                'icon'  => 'zap',
+                'path'  => 'engineer'
+            ],
+            'part' => [
+                'name'  => 'Parts',
+                'icon'  => 'cpu',
+                'path'  => 'parts'
+            ],
+            'performance' => [
+                'name'  => 'Performance',
+                'icon'  => 'users',
+                'path'  => 'performance'
+            ],
+            'setting' => [
+                'name'  => 'Settings',
+                'icon'  => 'settings',
+                'path'  => 'setting'
+            ],
+            'logout' => [
+                'name'  => 'Sign Out',
+                'icon'  => 'log-out',
+                'path'  => 'logout'
+            ],
+        ];
+
+        $access = [
+            'ENGINEER'  => ['dashboard', 'engineer', 'logout'],
+            'CS'        => ['dashboard', 'cs', 'logout'],
+            'ADMIN'     => ['dashboard', 'cs', 'part', 'logout'],
+            'MANAGER'   => ['dashboard', 'cs', 'engineer', 'part', 'performance', 'setting', 'logout']
+        ];
+
+        if (array_key_exists(strtoupper($type), $access)) {
+            $assigned = $access[strtoupper($type)];
+            $auth = [];
+            for ($i=0; $i < count($assigned); $i++) { 
+                $auth[] = $menu[$assigned[$i]];
+            };
+        } else {
+            $auth = [
+                [
+                    'name'  => 'Sign Out',
+                    'icon'  => 'log-out',
+                    'path'  => 'logout'
+                ]
+            ];
+        }
+
+        return $auth;
     }
 }

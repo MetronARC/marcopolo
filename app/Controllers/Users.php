@@ -163,4 +163,13 @@ class Users extends BaseController
             return 'true';
         }
     }
+
+    public function get($type)
+    {
+        $type       = strtoupper($type);
+        $usermod    = new UserModel();
+        $data       = $usermod->where('type', $type)->get()->getResult();
+
+        return json_encode($data);
+    }
 }
