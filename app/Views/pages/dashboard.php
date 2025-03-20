@@ -7,7 +7,7 @@
 
     <div class="w-100">
         <div class="row">
-            <div class="col-sm-3">
+            <div class="col">
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
@@ -32,7 +32,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-3">
+            <div class="col">
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
@@ -57,7 +57,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-3">
+            <div class="col">
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
@@ -82,7 +82,32 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-3">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col mt-0">
+                                <h5 class="card-title">Wait For Escalation</h5>
+                            </div>
+
+                            <div class="col-auto">
+                                <div class="stat text-primary">
+                                    <i class="align-middle" data-feather="send"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <h1 class="mt-1 mb-3" id="escalation-count">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </h1>
+                        <div class="mb-0">
+                            <span class="text-muted">Unit</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
@@ -111,8 +136,8 @@
     </div>
 
     <div class="row">
-        <div class="col-12 col-md-12 col-xxl-4 d-flex order-2 order-xxl-3">
-            <div class="card flex-fill w-100">
+        <div class="col-12 col-md-12 col-xxl-4 order-2 order-xxl-3">
+            <div class="card w-100">
                 <div class="card-header">
 
                     <h5 class="card-title mb-0">Device</h5>
@@ -212,6 +237,7 @@
                 document.getElementById('new-ticket-count').textContent = data.new;
                 document.getElementById('in-progress-count').textContent = data.checking;
                 document.getElementById('wait-part-count').textContent = data.waitpart;
+                document.getElementById('escalation-count').textContent = data.escalation;
                 document.getElementById('ready-pickup-count').textContent = data.waitpickup;
             })
             .catch(error => {
@@ -219,6 +245,7 @@
                 document.getElementById('new-ticket-count').textContent = 'Error';
                 document.getElementById('in-progress-count').textContent = 'Error';
                 document.getElementById('wait-part-count').textContent = 'Error';
+                document.getElementById('escalation-count').textContent = 'Error';
                 document.getElementById('ready-pickup-count').textContent = 'Error';
             });
     }
@@ -290,30 +317,27 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log('Device Statistics:', data);
-                    
+                    let deviceArray = Object.keys(data);
+                    let deviceCount = [];
+                    let deviceColor = [];
                     // Destroy existing chart if it exists
                     if (deviceChart) {
                         deviceChart.destroy();
                     }
 
+                    Object.entries(data).forEach(([key, value]) => {
+                        deviceCount.push(value || 0);
+                        deviceColor.push(window.theme.primary);
+                    });
+
                     // Create new chart with fetched data
                     deviceChart = new Chart(document.getElementById("chartjs-dashboard-pie"), {
                         type: "pie",
                         data: {
-                            labels: ["Laptop", "Smartphone", "Smartwatch", "Tablet"],
+                            labels: deviceArray,
                             datasets: [{
-                                data: [
-                                    data.Laptop || 0,
-                                    data.Smartphone || 0,
-                                    data.Smartwatch || 0,
-                                    data.Tablet || 0
-                                ],
-                                backgroundColor: [
-                                    window.theme.primary,
-                                    window.theme.warning,
-                                    window.theme.danger,
-                                    window.theme.info
-                                ],
+                                data: deviceCount,
+                                backgroundColor: deviceColor,
                                 borderWidth: 5
                             }]
                         },
@@ -329,24 +353,35 @@
 
                     // Update the table data
                     const tableBody = document.querySelector('table tbody');
-                    tableBody.innerHTML = `
-                        <tr>
-                            <td>Laptop</td>
-                            <td class="text-end">${data.Laptop || 0}</td>
-                        </tr>
-                        <tr>
-                            <td>Smartphone</td>
-                            <td class="text-end">${data.Smartphone || 0}</td>
-                        </tr>
-                        <tr>
-                            <td>Smartwatch</td>
-                            <td class="text-end">${data.Smartwatch || 0}</td>
-                        </tr>
-                        <tr>
-                            <td>Tablet</td>
-                            <td class="text-end">${data.Tablet || 0}</td>
-                        </tr>
-                    `;
+                    let displayData = '';
+                    Object.entries(data).forEach(([key, value]) => {
+                        displayData += `
+                            <tr>
+                                <td>${key}</td>
+                                <td class="text-end">${value || 0}</td>
+                            </tr>
+                        `
+                    });
+                    console.log(displayData)
+                    tableBody.innerHTML = displayData
+                    // tableBody.innerHTML = `
+                    //     <tr>
+                    //         <td>Laptop</td>
+                    //         <td class="text-end">${data.Laptop || 0}</td>
+                    //     </tr>
+                    //     <tr>
+                    //         <td>Smartphone</td>
+                    //         <td class="text-end">${data.Smartphone || 0}</td>
+                    //     </tr>
+                    //     <tr>
+                    //         <td>Smartwatch</td>
+                    //         <td class="text-end">${data.Smartwatch || 0}</td>
+                    //     </tr>
+                    //     <tr>
+                    //         <td>Tablet</td>
+                    //         <td class="text-end">${data.Tablet || 0}</td>
+                    //     </tr>
+                    // `;
                 })
                 .catch(error => {
                     console.error('Error fetching device statistics:', error);

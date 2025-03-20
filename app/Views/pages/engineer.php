@@ -10,7 +10,7 @@ helper('auth');
 
 <div class="w-100">
     <div class="row">
-        <div class="col-sm-3">
+        <div class="col">
             <div class="card">
                 <div class="card-body">
                     <div class="row">
@@ -35,7 +35,7 @@ helper('auth');
                 </div>
             </div>
         </div>
-        <div class="col-sm-3">
+        <div class="col">
             <div class="card">
                 <div class="card-body">
                     <div class="row">
@@ -60,7 +60,7 @@ helper('auth');
                 </div>
             </div>
         </div>
-        <div class="col-sm-3">
+        <div class="col">
             <div class="card">
                 <div class="card-body">
                     <div class="row">
@@ -85,7 +85,32 @@ helper('auth');
                 </div>
             </div>
         </div>
-        <div class="col-sm-3">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col mt-0">
+                            <h5 class="card-title">Wait For Escalation</h5>
+                        </div>
+
+                        <div class="col-auto">
+                            <div class="stat text-primary">
+                                <i class="align-middle" data-feather="send"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h1 class="mt-1 mb-3" id="escalation-count">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </h1>
+                    <div class="mb-0">
+                        <span class="text-muted">Unit</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
             <div class="card">
                 <div class="card-body">
                     <div class="row">
@@ -236,6 +261,7 @@ helper('auth');
                 document.getElementById('new-ticket-count').textContent = data['NEW'] || 0;
                 document.getElementById('in-progress-count').textContent = data['CHECKING'] || 0;
                 document.getElementById('wait-part-count').textContent = data['WAIT FOR PART'] || 0;
+                document.getElementById('escalation-count').textContent = data['WAIT FOR ESCALATION'] || 0;
                 document.getElementById('ready-pickup-count').textContent = data['WAIT FOR PICKUP'] || 0;
             })
             .catch(error => {
@@ -243,6 +269,7 @@ helper('auth');
                 document.getElementById('new-ticket-count').textContent = 'Error';
                 document.getElementById('in-progress-count').textContent = 'Error';
                 document.getElementById('wait-part-count').textContent = 'Error';
+                document.getElementById('escalation-count').textContent = 'Error';
                 document.getElementById('ready-pickup-count').textContent = 'Error';
             });
     }
