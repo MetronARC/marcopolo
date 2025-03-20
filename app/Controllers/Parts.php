@@ -18,13 +18,15 @@ class Parts extends BaseController
     {
         $data = [
             'part_id'       => $this->createid(),
-            'device'        => $this->request->getVar('device'),
             'brand'         => $this->request->getVar('brand'),
             'type'          => $this->request->getVar('type'),
-            'name'          => $this->request->getVar('name'),
-            'price'         => $this->request->getVar('price'),
+            'part_number'   => $this->request->getVar('part_number'),
+            'part_name'     => $this->request->getVar('part_name'),
+            'part_sn'       => $this->request->getVar('part_sn'),
+            'part_case_no'  => $this->request->getVar('part_case_no'),
+            'awb_no'        => $this->request->getVar('awb_no'),
             'status'        => 'STOCK',
-            'created_at'    => date('Y-m-d H:i:s')
+            'created_at'    => date('Y-m-d H:i:s'),
         ];
 
         $partmod = new PartsModel();
@@ -143,14 +145,14 @@ class Parts extends BaseController
 
     public function search()
     {
-        $partmod = new PartsModel();
-        if ($this->request->getVar('brand')) { $partmod->where('brand');}
-        if ($this->request->getVar('type')) { $partmod->where('type');}
-        if ($this->request->getVar('name')) { $partmod->where('name');}
-        $partmod->where('status', 'STOCK');
-        $data = $partmod->get()->getResult();
+        // $partmod = new PartsModel();
+        // if ($this->request->getVar('brand')) { $partmod->where('brand');}
+        // if ($this->request->getVar('type')) { $partmod->where('type');}
+        // if ($this->request->getVar('name')) { $partmod->where('name');}
+        // $partmod->where('status', 'STOCK');
+        // $data = $partmod->get()->getResult();
 
-        return json_encode($data);
+        // return json_encode($data);
     }
 
     public function cancel()

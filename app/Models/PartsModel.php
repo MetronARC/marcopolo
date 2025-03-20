@@ -15,15 +15,17 @@ class PartsModel extends Model
     protected $allowedFields    = [
         'id',
         'part_id',
-        'device',
         'brand',
         'type',
-        'name',
-        'price',
+        'part_number',
+        'part_name',
+        'part_sn',
+        'part_case_no',
+        'awb_no',
         'status',
         'rma',
         'used_at',
-        'created_at'
+        'created_at',
     ];
 
     protected bool $allowEmptyInserts = false;
