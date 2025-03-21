@@ -16,8 +16,8 @@ class Ticket extends BaseController
 
     public function create()
     {
-        if($this->request->getVar('new_device')){
-            $device = $this->request->getVar('new_device');
+        if($this->request->getVar('customdevice')){
+            $device = $this->request->getVar('customdevice');
             $devicemod = new DeviceModel();
             $newdevice = [
                 'device'        => $device,
@@ -219,8 +219,12 @@ class Ticket extends BaseController
 
     public function unfinish_cs()
     {
+        $status = [
+            'CHECKING', 
+            'WAIT FOR PICKUP',
+        ];
         $ticketmod = new TicketModel();
-        $data = $ticketmod->orderBy('created_at', 'ASC')->where('ticket_status', 'WAIT FOR PICKUP')->get()->getResult();
+        $data = $ticketmod->orderBy('created_at', 'DESC')->whereIn('ticket_status', $status)->get()->getResult();
 
         return json_encode($data);
     }

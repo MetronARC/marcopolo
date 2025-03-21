@@ -15,7 +15,9 @@ helper('auth');
     <div class="col-12 d-flex">
         <div class="card flex-fill">
             <div class="card-header">
-                <h5 class="card-title mb-0">Latest Tickets</h5>
+                <b>Tickets</b>
+                <button class="btn btn-success float-end me-2" onclick="loadTickets()"><i class="fa-solid fa-arrows-rotate fa-spin"></i></button>
+                <button class="btn btn-info float-end me-2"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
             <table class="table table-hover my-0">
                 <thead>
@@ -76,7 +78,10 @@ helper('auth');
                     <div class="row mb-3">
                         <div class="col-md-4">
                             <label for="device" class="form-label">Device</label>
-                            <input type="text" class="form-control" id="device" name="device" required>
+                            <select class="form-select" id="device" name="device" required>
+                            <option value="">Select Device</option>
+                            </select>
+                            <input type="text" id="customdevice" name="customdevice" class="form-control mt-2" placeholder="Enter device name" style="display: none;">
                         </div>
                         <div class="col-md-4">
                             <label for="brand" class="form-label">Brand</label>
@@ -112,8 +117,11 @@ helper('auth');
                             <input type="date" class="form-control" id="warranty_date" name="warranty_date">
                         </div>
                         <div class="col-md-6">
-                            <label for="device_condition" class="form-label">Device Condition</label>
-                            <input type="text" class="form-control" id="device_condition" name="device_condition" required>
+                            <label for="device_condition" class="form-label">Device Status</label>
+                            <select class="form-select" id="device_condition" name="device_condition" required>
+                                <option value="Unit Customer">Unit Customer</option>
+                                <option value="Stock Toko">Stock Toko</option>
+                            </select>
                         </div>
                     </div>
                     <div class="mb-3">
@@ -130,7 +138,9 @@ helper('auth');
                     </div>
                     <div class="mb-3">
                         <label for="engineer" class="form-label">Engineer</label>
-                        <input type="text" class="form-control" id="engineer" name="engineer" required>
+                        <select class="form-select" id="engineer" name="engineer" required>
+                            <option value="">Select Engineer</option>
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -153,7 +163,7 @@ helper('auth');
                 <div class="modal-body">
                     <input type="hidden" id="update_rma" name="rma">
                     <input type="hidden" id="update_user" name="user" value="<?= session('name') ?>">
-                    
+
                     <div class="mb-3">
                         <label for="ticket_status" class="form-label">Status</label>
                         <select class="form-select" id="ticket_status" name="ticket_status" required>
@@ -284,6 +294,8 @@ helper('auth');
         try {
             await loadTickets();
             await loadBrands();
+            await loadEngineer();
+            await loadDevice();
         } catch (error) {
             console.error('Failed to load initial data:', error);
         }
@@ -350,7 +362,7 @@ helper('auth');
         e.preventDefault();
 
         const formData = new FormData(this);
-        const user = '<?= session('name') ?>'; 
+        const user = '<?= session('name') ?>';
         formData.append('user', user);
 
         try {
@@ -385,15 +397,26 @@ helper('auth');
         }
     });
 
+    document.getElementById("device").addEventListener("change", function () {
+        var customInput = document.getElementById("customdevice");
+        if (this.value === "other") {
+            customInput.style.display = "block";
+            customInput.setAttribute("required", "required");
+        } else {
+            customInput.style.display = "none";
+            customInput.removeAttribute("required");
+        }
+    });
+
     async function loadBrands() {
         try {
             const response = await fetch('/brand/get');
             const data = await response.json();
             console.log('Brand Data:', data);
-            
+
             const brandSelect = document.getElementById('brand');
             brandSelect.innerHTML = '<option value="">Select Brand</option>';
-            
+
             data.forEach(brand => {
                 const option = document.createElement('option');
                 option.value = brand.brand;
@@ -406,6 +429,62 @@ helper('auth');
                 icon: 'error',
                 title: 'Oops...',
                 text: 'Failed to load brands. Please refresh the page.',
+            });
+        }
+    }
+
+    async function loadEngineer() {
+        try {
+            const response = await fetch('/user/get/ENGINEER');
+            const data = await response.json();
+            console.log('Engineer Data:', data);
+
+            const brandSelect = document.getElementById('engineer');
+            brandSelect.innerHTML = '<option value="">Select Engineer</option>';
+
+            data.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.name;
+                option.textContent = user.name;
+                brandSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading engineer:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Failed to load engineer. Please refresh the page.',
+            });
+        }
+    }
+
+    async function loadDevice() {
+        try {
+            const response = await fetch('/device/get');
+            const data = await response.json();
+            console.log('Device Data:', data);
+
+            const brandSelect = document.getElementById('device');
+            brandSelect.innerHTML = '<option value="">Select Device</option>';
+
+            data.forEach(device => {
+                const option = document.createElement('option');
+                option.value = device.device;
+                option.textContent = device.device;
+                brandSelect.appendChild(option);
+            });
+
+            const otheroption = document.createElement('option');
+            otheroption.value = 'other';
+            otheroption.textContent = '+ Add New Device';
+            brandSelect.appendChild(otheroption);
+            
+        } catch (error) {
+            console.error('Error loading device:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Failed to load device. Please refresh the page.',
             });
         }
     }
