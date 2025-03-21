@@ -5,7 +5,7 @@ helper('auth');
 <?= $this->extend('template/index') ?>
 <?= $this->section('page-content') ?>
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0"><strong>Ticket</strong> Table</h1>
+    <h1 class="h3 mb-0"><strong>Customer Service</strong> Dashboard</h1>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerTicketModal">
         <i class="align-middle" data-feather="plus"></i> Register Ticket
     </button>
@@ -17,7 +17,7 @@ helper('auth');
             <div class="card-header">
                 <b>Tickets</b>
                 <button class="btn btn-success float-end me-2" onclick="loadTickets()"><i class="fa-solid fa-arrows-rotate fa-spin"></i></button>
-                <button class="btn btn-info float-end me-2"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <button class="btn btn-info float-end me-2" data-bs-toggle="modal" data-bs-target="#searchTicketModal"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
             <table class="table table-hover my-0">
                 <thead>
@@ -213,6 +213,66 @@ helper('auth');
     </div>
 </div>
 
+<div class="modal fade" id="searchTicketModal" tabindex="-1" aria-labelledby="searchTicketModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="searchTicketModalLabel">Search Ticket</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="searchTicketForm">
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="search_rma" class="form-label">Ticket ID</label>
+                            <input type="text" class="form-control" id="search_rma" name="search_rma">
+                        </div>
+                        <div class="col">
+                            <label for="search_engineer" class="form-label">Engineer</label>
+                            <select class="form-control" id="search_engineer" name="search_engineer"></select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="search_status" class="form-label">Status</label>
+                            <select class="form-control" id="search_status" name="search_status">
+                                <option value="">Select Status</option>
+                                <option value="CHECKING">CHECKING</option>
+                                <option value="WAIT FOR PART">WAIT FOR PART</option>
+                                <option value="WAIT FOR DATA">WAIT FOR DATA</option>
+                                <option value="WAIT FOR PASSWORD">WAIT FOR PASSWORD</option>
+                                <option value="WAIT FOR PRICE">WAIT FOR PRICE</option>
+                                <option value="WAIT FOR REPLACEMENT">WAIT FOR REPLACEMENT</option>
+                                <option value="WAIT FOR UNIT">WAIT FOR UNIT</option>
+                                <option value="WAIT FOR ESCALATION">WAIT FOR ESCALATION</option>
+                                <option value="WAIT FOR PICKUP">WAIT FOR PICKUP</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <label for="search_device" class="form-label">Device</label>
+                            <select class="form-control" id="search_device" name="search_device"></select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="search_startdate" class="form-label">Date Start</label>
+                            <input type="date" class="form-control" id="search_startdate" name="search_startdate">
+                        </div>
+                        <div class="col">
+                            <label for="search_enddate" class="form-label">Date End</label>
+                            <input type="date" class="form-control" id="search_enddate" name="search_enddate">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Search Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     function loadTickets() {
         return new Promise((resolve, reject) => {
@@ -245,12 +305,13 @@ helper('auth');
                         <td><span class="badge bg-${getStatusColor(ticket.ticket_status)}">${ticket.ticket_status}</span></td>
                         <td class="d-none d-md-table-cell">${ticket.engineer || '-'}</td>
                         <td>
-                            <button type="button" class="btn btn-sm btn-primary update-ticket-btn" 
+                            <button type="button" class="btn btn-sm btn-primary update-ticket-btn me-2" 
                                 data-rma="${ticket.rma}"
                                 data-bs-toggle="modal" 
                                 data-bs-target="#updateTicketModal">
                                 Update Ticket
                             </button>
+                            <a class="btn btn-sm btn-success" href="/ticket/ticketprint/${ticket.rma}" target="_blank"><i class="fa-solid fa-print"></i> Print</a> 
                         </td>
                     `;
                             tableBody.appendChild(row);
@@ -397,6 +458,67 @@ helper('auth');
         }
     });
 
+    document.getElementById('searchTicketForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        try {
+            const response = await fetch('/ticket/search', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if (data) {
+                const tableBody = document.getElementById('ticketTableBody');
+                    tableBody.innerHTML = '';
+
+                    if (data.length === 0) {
+                        tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center">No tickets found</td>
+                    </tr>
+                `;
+                    } else {
+                        data.forEach(ticket => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                        <td>${ticket.rma}</td>
+                        <td>${ticket.customer_name}</td>
+                        <td class="d-none d-xl-table-cell">${formatDate(ticket.created_at)}</td>
+                        <td class="d-none d-xl-table-cell">${ticket.close_date ? formatDate(ticket.close_date) : '-'}</td>
+                        <td><span class="badge bg-${getStatusColor(ticket.ticket_status)}">${ticket.ticket_status}</span></td>
+                        <td class="d-none d-md-table-cell">${ticket.engineer || '-'}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-primary update-ticket-btn me-2" 
+                                data-rma="${ticket.rma}"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#updateTicketModal">
+                                Update Ticket
+                            </button>
+                            <a class="btn btn-sm btn-success" href="/ticket/ticketprint/${ticket.rma}" target="_blank"><i class="fa-solid fa-print"></i> Print</a> 
+                        </td>
+                    `;
+                            tableBody.appendChild(row);
+                        });
+                    }
+                const modal = bootstrap.Modal.getInstance(document.getElementById('searchTicketModal'));
+                modal.hide();
+                this.reset();
+            } else {
+                throw new Error('No ticket found');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'An error occurred while search the ticket.',
+            });
+        }
+    });
+
     document.getElementById("device").addEventListener("change", function () {
         var customInput = document.getElementById("customdevice");
         if (this.value === "other") {
@@ -439,14 +561,17 @@ helper('auth');
             const data = await response.json();
             console.log('Engineer Data:', data);
 
-            const brandSelect = document.getElementById('engineer');
-            brandSelect.innerHTML = '<option value="">Select Engineer</option>';
+            const engineerSelect = document.getElementById('engineer');
+            engineerSelect.innerHTML = '<option value="">Select Engineer</option>';
+            const engineersearchSelect = document.getElementById('search_engineer');
+            engineersearchSelect.innerHTML = '<option value="">Select Engineer</option>';
 
             data.forEach(user => {
                 const option = document.createElement('option');
                 option.value = user.name;
                 option.textContent = user.name;
-                brandSelect.appendChild(option);
+                engineerSelect.appendChild(option);
+                engineersearchSelect.appendChild(option);
             });
         } catch (error) {
             console.error('Error loading engineer:', error);
@@ -464,20 +589,23 @@ helper('auth');
             const data = await response.json();
             console.log('Device Data:', data);
 
-            const brandSelect = document.getElementById('device');
-            brandSelect.innerHTML = '<option value="">Select Device</option>';
+            const deviceSelect = document.getElementById('device');
+            deviceSelect.innerHTML = '<option value="">Select Device</option>';
+            const devicesearchSelect = document.getElementById('search_device');
+            devicesearchSelect.innerHTML = '<option value="">Select Device</option>';
 
             data.forEach(device => {
                 const option = document.createElement('option');
                 option.value = device.device;
                 option.textContent = device.device;
-                brandSelect.appendChild(option);
+                deviceSelect.appendChild(option);
+                devicesearchSelect.appendChild(option);
             });
 
             const otheroption = document.createElement('option');
             otheroption.value = 'other';
             otheroption.textContent = '+ Add New Device';
-            brandSelect.appendChild(otheroption);
+            deviceSelect.appendChild(otheroption);
             
         } catch (error) {
             console.error('Error loading device:', error);

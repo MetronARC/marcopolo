@@ -11,12 +11,11 @@
     <div class="container-fluid p-0 m-0">
         <div class="row">
             <div class="col-2">
-                <img src="/assets/img/logo.jpg" style="width: 80px; height: auto;" class="img-fluid" alt="">
+                <img src="/assets/img/logo.png" style="width: 80px; height: auto;" class="img-fluid" alt="">
             </div>
             <div class="col-10">
                 <b>PT. Karya Mura Niaga</b><br>
-                Alamat : lorem ipsum dolor sit amet bla bla bla<br>
-                Phone : 081289898989 | Email : test@admin.com
+                <b>Alamat</b> : Komplek Ruko Mahkota Raya Blok C No 1&2, Kel. Teluk Tering, Kec. Batam Kota, Kota Batam, Kepulauan Riau, 29444 <b>Phone</b> : +62 853-6314-6277
             </div>
         </div><hr>
         <div class="row mb-2">
@@ -59,10 +58,6 @@
                             <td>: <?= $ticket->type ?></td>
                         </tr>
                         <tr>
-                            <td style="width: 30%;">SN</td>
-                            <td>: <?= $ticket->sn ?></td>
-                        </tr>
-                        <tr>
                             <td style="width: 30%;">Warranty</td>
                             <td>: <b><?= ($ticket->warranty == 1) ? 'In Warranty' : 'Not Warranty' ?></b> / <?= $ticket->warranty_date ?></td>
                         </tr>
@@ -73,23 +68,23 @@
             <table>
                     <tbody>
                         <tr>
-                            <td style="width: 30%;">Kondisi</td>
+                            <td style="width: 30%;">SN</td>
+                            <td>: <?= $ticket->sn ?></td>
+                        </tr>
+                        <tr>
+                            <td style="width: 50%;">Kondisi</td>
                             <td>: <?= $ticket->device_condition ?></td>
                         </tr>
                         <tr>
-                            <td style="width: 30%;">Problem</td>
+                            <td style="width: 50%;">Problem</td>
                             <td>: <?= $ticket->problem ?></td>
                         </tr>
                         <tr>
-                            <td style="width: 30%;">Detail Problem</td>
-                            <td>: <?= $ticket->detail_problem ?></td>
-                        </tr>
-                        <tr>
-                            <td style="width: 30%;">Aksesoris</td>
+                            <td style="width: 50%;">Aksesoris</td>
                             <td>: <?= $ticket->accessories ?></td>
                         </tr>
                         <tr>
-                            <td style="width: 30%;">Engineer</td>
+                            <td style="width: 50%;">Engineer</td>
                             <td>: <?= $ticket->engineer ?></td>
                         </tr>
                     </tbody>
@@ -97,15 +92,20 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-1"></div>
-            <div class="col-3 text-center">
-                CS<br><br><br><br><?= session('name') ?>
-            </div>
-            <div class="col-4"></div>
-            <div class="col-3 text-center">
-                Customer<br><br><br><br><?= $ticket->customer_name ?>
+            <div class="col-2 text-center">
+                <b>CS</b><br><br><br><br><?= session('name') ?>
             </div>
             <div class="col-1"></div>
+            <div class="col-2 text-center">
+                <b>Customer</b><br><br><br><br><?= $ticket->customer_name ?>
+            </div>
+            <div class="col-1"></div>
+            <div class="col-6 d-flex">
+                <div class="border border-dark flex-fill p-1">
+                    <b>Detail Problem</b> :<br>
+                    <?= $ticket->detail_problem ?>
+                </div>
+            </div>
         </div>
     </div>
 </body>

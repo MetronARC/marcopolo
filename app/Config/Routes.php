@@ -37,6 +37,7 @@ $routes->group('user', static function ($routes) {
 
 $routes->group('ticket', static function ($routes) {
     $routes->post('create', 'Ticket::create', ['filter' => 'authGuard']);
+    $routes->post('search', 'Ticket::search', ['filter' => 'authGuard']);
     $routes->post('update/engineer', 'Ticket::update_engineer', ['filter' => 'authGuard']);
     $routes->post('update/cs', 'Ticket::update_cs', ['filter' => 'authGuard']);
     $routes->get('unfinish/engineer', 'Ticket::unfinish_engineer', ['filter' => 'authGuard']);

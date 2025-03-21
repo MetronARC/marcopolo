@@ -349,4 +349,18 @@ class Ticket extends BaseController
         $data = $devicemod->findAll();
         return json_encode($data);
     }
+
+    public function search()
+    {
+        $ticketmod      = new TicketModel();
+        if($this->request->getVar('search_rma')) { $ticketmod->where('rma', $this->request->getVar('search_rma')); }
+        if($this->request->getVar('search_engineer')) { $ticketmod->where('engineer', $this->request->getVar('search_engineer')); }
+        if($this->request->getVar('search_status')) { $ticketmod->where('ticket_status', $this->request->getVar('search_status')); }
+        if($this->request->getVar('search_device')) { $ticketmod->where('device', $this->request->getVar('search_device')); }
+        if($this->request->getVar('search_startdate')) { $ticketmod->where('created_at >=', $this->request->getVar('search_startdate')); }
+        if($this->request->getVar('search_enddate')) { $ticketmod->where('created_at <=', $this->request->getVar('search_enddate')); }
+
+        $data = $ticketmod->orderBy('created_at', 'DESC')->get()->getResult();
+        return json_encode($data);
+    }
 }
