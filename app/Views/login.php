@@ -64,7 +64,8 @@
 					<div class="d-table-cell align-middle">
 
 						<div class="text-center mt-4">
-							<h1 class="h2">AppDesk v1.0</h1>
+							<img class="img-fluid" src="/assets/img/logo.png" style="width: 80px; height:auto;">
+							<h1 class="h2">PT. Karya Mura Niaga</h1>
 							<p class="lead">
 								Sign in to your account to continue
 							</p>

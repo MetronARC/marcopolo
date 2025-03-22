@@ -172,4 +172,11 @@ class Users extends BaseController
 
         return json_encode($data);
     }
+
+    public function getlogid($id)
+    {
+        $userlogmod = new UserlogModel();
+        $data = $userlogmod->where('id', $id)->get()->getRow();
+        return json_encode($data);
+    }
 }

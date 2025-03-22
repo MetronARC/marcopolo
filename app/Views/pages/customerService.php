@@ -297,23 +297,29 @@ helper('auth');
                     } else {
                         data.forEach(ticket => {
                             const row = document.createElement('tr');
+                            let updateButton = '';
+                            if (ticket.ticket_status == 'WAIT FOR PICKUP') {
+                                updateButton = `
+                                    <button type="button" class="btn btn-sm btn-primary update-ticket-btn me-2" 
+                                        data-rma="${ticket.rma}"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#updateTicketModal">
+                                        Update Ticket
+                                    </button>
+                                `
+                            }
                             row.innerHTML = `
-                        <td>${ticket.rma}</td>
-                        <td>${ticket.customer_name}</td>
-                        <td class="d-none d-xl-table-cell">${formatDate(ticket.created_at)}</td>
-                        <td class="d-none d-xl-table-cell">${ticket.close_date ? formatDate(ticket.close_date) : '-'}</td>
-                        <td><span class="badge bg-${getStatusColor(ticket.ticket_status)}">${ticket.ticket_status}</span></td>
-                        <td class="d-none d-md-table-cell">${ticket.engineer || '-'}</td>
-                        <td>
-                            <button type="button" class="btn btn-sm btn-primary update-ticket-btn me-2" 
-                                data-rma="${ticket.rma}"
-                                data-bs-toggle="modal" 
-                                data-bs-target="#updateTicketModal">
-                                Update Ticket
-                            </button>
-                            <a class="btn btn-sm btn-success" href="/ticket/ticketprint/${ticket.rma}" target="_blank"><i class="fa-solid fa-print"></i> Print</a> 
-                        </td>
-                    `;
+                                <td>${ticket.rma}</td>
+                                <td>${ticket.customer_name}</td>
+                                <td class="d-none d-xl-table-cell">${formatDate(ticket.created_at)}</td>
+                                <td class="d-none d-xl-table-cell">${ticket.close_date ? formatDate(ticket.close_date) : '-'}</td>
+                                <td><span class="badge bg-${getStatusColor(ticket.ticket_status)}">${ticket.ticket_status}</span></td>
+                                <td class="d-none d-md-table-cell">${ticket.engineer || '-'}</td>
+                                <td>
+                                    ${updateButton}
+                                    <a class="btn btn-sm btn-success" href="/ticket/ticketprint/${ticket.rma}" target="_blank"><i class="fa-solid fa-print"></i> Print</a> 
+                                </td>
+                            `;
                             tableBody.appendChild(row);
                         });
                     }
@@ -483,23 +489,28 @@ helper('auth');
                     } else {
                         data.forEach(ticket => {
                             const row = document.createElement('tr');
+                            if (ticket.ticket_status == 'WAIT FOR PICKUP') {
+                                updateButton = `
+                                    <button type="button" class="btn btn-sm btn-primary update-ticket-btn me-2" 
+                                        data-rma="${ticket.rma}"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#updateTicketModal">
+                                        Update Ticket
+                                    </button>
+                                `
+                            }
                             row.innerHTML = `
-                        <td>${ticket.rma}</td>
-                        <td>${ticket.customer_name}</td>
-                        <td class="d-none d-xl-table-cell">${formatDate(ticket.created_at)}</td>
-                        <td class="d-none d-xl-table-cell">${ticket.close_date ? formatDate(ticket.close_date) : '-'}</td>
-                        <td><span class="badge bg-${getStatusColor(ticket.ticket_status)}">${ticket.ticket_status}</span></td>
-                        <td class="d-none d-md-table-cell">${ticket.engineer || '-'}</td>
-                        <td>
-                            <button type="button" class="btn btn-sm btn-primary update-ticket-btn me-2" 
-                                data-rma="${ticket.rma}"
-                                data-bs-toggle="modal" 
-                                data-bs-target="#updateTicketModal">
-                                Update Ticket
-                            </button>
-                            <a class="btn btn-sm btn-success" href="/ticket/ticketprint/${ticket.rma}" target="_blank"><i class="fa-solid fa-print"></i> Print</a> 
-                        </td>
-                    `;
+                                <td>${ticket.rma}</td>
+                                <td>${ticket.customer_name}</td>
+                                <td class="d-none d-xl-table-cell">${formatDate(ticket.created_at)}</td>
+                                <td class="d-none d-xl-table-cell">${ticket.close_date ? formatDate(ticket.close_date) : '-'}</td>
+                                <td><span class="badge bg-${getStatusColor(ticket.ticket_status)}">${ticket.ticket_status}</span></td>
+                                <td class="d-none d-md-table-cell">${ticket.engineer || '-'}</td>
+                                <td>
+                                    ${updateButton}
+                                    <a class="btn btn-sm btn-success" href="/ticket/ticketprint/${ticket.rma}" target="_blank"><i class="fa-solid fa-print"></i> Print</a> 
+                                </td>
+                            `;
                             tableBody.appendChild(row);
                         });
                     }

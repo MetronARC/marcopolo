@@ -33,6 +33,7 @@ $routes->group('user', static function ($routes) {
     $routes->get('getlog', 'Users::getlog');
     $routes->post('searchlog', 'Users::searchlog');
     $routes->post('validation', 'Users::validation');
+    $routes->get('get/log/(:segment)', 'Users::getlogid/$1');
 });
 
 $routes->group('ticket', static function ($routes) {
