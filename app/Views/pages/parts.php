@@ -23,14 +23,7 @@ helper('auth');
         </div>
         <div class="card-body">
             <div class="row mb-3">
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <select class="form-select" id="searchBrand">
-                            <option value="">Select brand...</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="input-group">
                         <select class="form-select" id="searchType">
                             <option value="">Select type...</option>
@@ -41,14 +34,14 @@ helper('auth');
                         </select>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="searchPartNumber" placeholder="Search by part number...">
-                    </div>
-                </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="input-group">
                         <input type="text" class="form-control" id="searchPartName" placeholder="Search by part name...">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="searchPartCaseNo" placeholder="Search by case number...">
                     </div>
                 </div>
             </div>
@@ -234,6 +227,8 @@ $(document).ready(function() {
             awb_no: $('#awb_no').val()
         };
 
+        console.log('Sending form data:', formData);
+
         // Send AJAX request to insert part
         $.ajax({
             url: '<?= base_url('parts/insert') ?>',
@@ -241,6 +236,7 @@ $(document).ready(function() {
             data: formData,
             dataType: 'json',
             success: function(response) {
+                console.log('Success response:', response);
                 // Close the modal and reset form
                 insertModal.hide();
                 $('#insertPartForm')[0].reset();
@@ -253,16 +249,33 @@ $(document).ready(function() {
                     timer: 1500
                 }).then(() => {
                     // Refresh the search results if any search parameters are set
-                    if ($('#searchBrand').val() || $('#searchType').val() || $('#searchPartNumber').val() || $('#searchPartName').val()) {
+                    if ($('#searchType').val() || $('#searchPartName').val() || $('#searchPartCaseNo').val()) {
                         $('#searchButton').click();
                     }
                 });
             },
             error: function(xhr, status, error) {
+                console.error('Error details:', {
+                    status: xhr.status,
+                    statusText: xhr.statusText,
+                    responseText: xhr.responseText,
+                    error: error
+                });
+
+                let errorMessage = 'Failed to insert part';
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.message) {
+                        errorMessage = response.message;
+                    }
+                } catch (e) {
+                    errorMessage += ': ' + error;
+                }
+
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: 'Failed to insert part: ' + error,
+                    text: errorMessage,
                     confirmButtonColor: '#d33'
                 });
             }
@@ -371,12 +384,11 @@ $(document).ready(function() {
     });
 
     $('#searchButton').on('click', function() {
-        const brand = $('#searchBrand').val();
         const type = $('#searchType').val();
-        const partNumber = $('#searchPartNumber').val();
-        const partName = $('#searchPartName').val();
+        const part_name = $('#searchPartName').val();
+        const part_case_no = $('#searchPartCaseNo').val();
 
-        if (!brand && !type && !partNumber && !partName) {
+        if (!type && !part_name && !part_case_no) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Warning',
@@ -389,29 +401,25 @@ $(document).ready(function() {
         $.ajax({
             url: '<?= base_url('parts/search') ?>',
             type: 'POST',
-            data: {},  // Send empty data to get all records
+            data: {
+                type: type,
+                part_name: part_name,
+                part_case_no: part_case_no
+            },
             success: function(response) {
                 try {
-                    const allData = JSON.parse(response);
-                    
-                    const filteredData = allData.filter(part => {
-                        const matchBrand = !brand || part.brand.toLowerCase().includes(brand.toLowerCase());
-                        const matchType = !type || part.type.toLowerCase().includes(type.toLowerCase());
-                        const matchPartNumber = !partNumber || part.part_number.toLowerCase().includes(partNumber.toLowerCase());
-                        const matchPartName = !partName || part.part_name.toLowerCase().includes(partName.toLowerCase());
-                        return matchBrand && matchType && matchPartNumber && matchPartName;
-                    });
+                    const data = JSON.parse(response);
                     
                     $('#searchPartsTable tbody').empty();
                     
-                    if (!filteredData || filteredData.length === 0) {
+                    if (!data || data.length === 0) {
                         $('#searchPartsTable tbody').append(`
                             <tr>
-                                <td colspan="8" class="text-center">No parts found matching your search criteria</td>
+                                <td colspan="10" class="text-center">No parts found matching your search criteria</td>
                             </tr>
                         `);
                     } else {
-                        filteredData.forEach(function(part) {
+                        data.forEach(function(part) {
                             let actionButton = '';
                             if (part.status === 'STOCK') {
                                 actionButton = `<button class="btn btn-sm btn-primary assignToTicket" 

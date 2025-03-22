@@ -148,7 +148,7 @@ class Parts extends BaseController
         $partmod = new PartsModel();
         if ($this->request->getVar('type')) { $partmod->where('type', $this->request->getVar('type'));}
         if ($this->request->getVar('part_name')) { $partmod->where('part_name', $this->request->getVar('part_name'));}
-        if ($this->request->getVar('part_case_no')) { $partmod->where('name', $this->request->getVar('part_case_no'));}
+        if ($this->request->getVar('part_case_no')) { $partmod->where('part_case_no', $this->request->getVar('part_case_no'));}
         $partmod->where('status', 'STOCK');
         $data = $partmod->get()->getResult();
 
@@ -207,7 +207,7 @@ class Parts extends BaseController
         $partmod = new PartsModel();
         $lastdata = $partmod->orderBy('created_at', 'DESC')->limit(1)->get()->getRow();
         if($lastdata){
-            $lastid = $lastdata->user_id;
+            $lastid = $lastdata->part_id;
             //P + [2 digit year] + [2 digit year] + [2 digit year] + [3 digit sequence]
             $lastyear   = substr($lastid, 1, 2);
             $lastmonth  = substr($lastid, 3, 2);
