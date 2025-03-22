@@ -4,14 +4,21 @@ helper('auth');
 
 <?= $this->extend('template/index') ?>
 <?= $this->section('page-content') ?>
-<!-- Add DataTables CSS -->
-<link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-<!-- Add DataTables JS -->
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
+<style>
+.loading-spinner {
+    display: none;
+}
+.loading .count-value {
+    display: none;
+}
+.loading .loading-spinner {
+    display: inline-block;
+}
+</style>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0"><strong>Ticket</strong> Data</h1>
+    <h1 class="h3 mb-0" id="page-heading"><strong>Engineer Performance</strong></h1>
     <div style="width: 200px;">
         <select class="form-select" id="engineer-select">
             <option value="">All Engineers</option>
@@ -34,7 +41,12 @@ helper('auth');
                             </div>
                         </div>
                     </div>
-                    <h1 class="mt-1 mb-3" id="new-ticket-count">0</h1>
+                    <h1 class="mt-1 mb-3">
+                        <span id="new-ticket-count" class="count-value">0</span>
+                        <div class="loading-spinner spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </h1>
                     <div class="mb-0">
                         <span class="text-muted">Unit</span>
                     </div>
@@ -54,7 +66,12 @@ helper('auth');
                             </div>
                         </div>
                     </div>
-                    <h1 class="mt-1 mb-3" id="in-progress-count">0</h1>
+                    <h1 class="mt-1 mb-3">
+                        <span id="in-progress-count" class="count-value">0</span>
+                        <div class="loading-spinner spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </h1>
                     <div class="mb-0">
                         <span class="text-muted">Unit</span>
                     </div>
@@ -74,7 +91,12 @@ helper('auth');
                             </div>
                         </div>
                     </div>
-                    <h1 class="mt-1 mb-3" id="wait-part-count">0</h1>
+                    <h1 class="mt-1 mb-3">
+                        <span id="wait-part-count" class="count-value">0</span>
+                        <div class="loading-spinner spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </h1>
                     <div class="mb-0">
                         <span class="text-muted">Unit</span>
                     </div>
@@ -94,7 +116,12 @@ helper('auth');
                             </div>
                         </div>
                     </div>
-                    <h1 class="mt-1 mb-3" id="escalation-count">0</h1>
+                    <h1 class="mt-1 mb-3">
+                        <span id="escalation-count" class="count-value">0</span>
+                        <div class="loading-spinner spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </h1>
                     <div class="mb-0">
                         <span class="text-muted">Unit</span>
                     </div>
@@ -114,7 +141,12 @@ helper('auth');
                             </div>
                         </div>
                     </div>
-                    <h1 class="mt-1 mb-3" id="ready-pickup-count">0</h1>
+                    <h1 class="mt-1 mb-3">
+                        <span id="ready-pickup-count" class="count-value">0</span>
+                        <div class="loading-spinner spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </h1>
                     <div class="mb-0">
                         <span class="text-muted">Unit</span>
                     </div>
@@ -158,7 +190,30 @@ helper('auth');
 <script>
     let ticketTable;
 
-    // Function to load engineers into dropdown
+    function showLoading() {
+        // Show loading for status counts
+        ['new-ticket-count', 'in-progress-count', 'wait-part-count', 'escalation-count', 'ready-pickup-count']
+            .forEach(id => document.getElementById(id).parentElement.classList.add('loading'));
+        
+        // Show loading for table
+        const tbody = document.querySelector('#ticket-table tbody');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+
+    function hideLoading() {
+        // Hide loading for status counts
+        ['new-ticket-count', 'in-progress-count', 'wait-part-count', 'escalation-count', 'ready-pickup-count']
+            .forEach(id => document.getElementById(id).parentElement.classList.remove('loading'));
+    }
+
     function loadEngineers() {
         fetch('/user/get/ENGINEER', {
             method: 'GET'
@@ -166,6 +221,7 @@ helper('auth');
         .then(response => response.json())
         .then(data => {
             const select = document.getElementById('engineer-select');
+            select.innerHTML = '<option value="">All Engineers</option>'; // Reset and add default option
             data.forEach(engineer => {
                 const option = document.createElement('option');
                 option.value = engineer.name;
@@ -178,19 +234,41 @@ helper('auth');
         });
     }
 
-    // Function to load ticket data
+    function resetCounts() {
+        document.getElementById('new-ticket-count').textContent = '0';
+        document.getElementById('in-progress-count').textContent = '0';
+        document.getElementById('wait-part-count').textContent = '0';
+        document.getElementById('escalation-count').textContent = '0';
+        document.getElementById('ready-pickup-count').textContent = '0';
+    }
+
     function loadTicketData(engineer = '') {
-        const url = engineer ? `/ticket/unfinish/engineer?user=${engineer}` : '/ticket/unfinish/all';
+        showLoading();
+        
+        const url = engineer ? `/ticket/unfinish/engineer?user=${engineer}` : '/ticket/search';
         
         fetch(url, {
-            method: 'GET',
+            method: engineer ? 'GET' : 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: engineer ? null : JSON.stringify({})
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
-            console.log('Fetched ticket data:');
-            console.log(JSON.stringify(data, null, 2));
+            console.log('Fetched ticket data:', data);
 
-            // Update ticket counts
+            if (!data || !Array.isArray(data)) {
+                resetCounts();
+                throw new Error('Invalid data format received');
+            }
+
             const statusCounts = {
                 'NEW': 0,
                 'CHECKING': 0,
@@ -211,43 +289,44 @@ helper('auth');
             document.getElementById('escalation-count').textContent = statusCounts['WAIT FOR ESCALATION'] || 0;
             document.getElementById('ready-pickup-count').textContent = statusCounts['WAIT FOR PICKUP'] || 0;
 
-            // Update ticket table
-            const tbody = document.querySelector('#ticket-table tbody');
-            tbody.innerHTML = '';
-
-            if (data.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="text-center">No tickets found</td>
-                    </tr>
-                `;
-            } else {
-                data.forEach(ticket => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${ticket.rma}</td>
-                        <td>${ticket.customer_name}</td>
-                        <td class="d-none d-xl-table-cell">${formatDate(ticket.created_at)}</td>
-                        <td><span class="badge bg-${getStatusColor(ticket.ticket_status)}">${ticket.ticket_status}</span></td>
-                        <td class="d-none d-md-table-cell">${ticket.engineer}</td>
-                        <td>
-                            <form action="/set_view_ticket" method="POST" class="d-inline">
-                                <input type="hidden" name="rma" value="${ticket.rma}">
-                                <button type="submit" class="btn btn-sm btn-info">View</button>
-                            </form>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            }
-
-            // Destroy existing DataTable if it exists
             if (ticketTable) {
                 ticketTable.destroy();
             }
 
-            // Initialize DataTable
             ticketTable = $('#ticket-table').DataTable({
+                data: data,
+                columns: [
+                    { data: 'rma' },
+                    { data: 'customer_name' },
+                    { 
+                        data: 'created_at',
+                        className: 'd-none d-xl-table-cell',
+                        render: function(data) {
+                            return formatDate(data);
+                        }
+                    },
+                    { 
+                        data: 'ticket_status',
+                        render: function(data) {
+                            return `<span class="badge bg-${getStatusColor(data)}">${data}</span>`;
+                        }
+                    },
+                    { 
+                        data: 'engineer',
+                        className: 'd-none d-md-table-cell'
+                    },
+                    { 
+                        data: 'rma',
+                        render: function(data) {
+                            return `
+                                <form action="/set_view_ticket" method="POST" class="d-inline">
+                                    <input type="hidden" name="rma" value="${data}">
+                                    <button type="submit" class="btn btn-sm btn-info">View</button>
+                                </form>
+                            `;
+                        }
+                    }
+                ],
                 pageLength: 10,
                 language: {
                     search: "Search:",
@@ -261,15 +340,28 @@ helper('auth');
                     }
                 }
             });
+
+            hideLoading();
         })
         .catch(error => {
             console.error('Error loading ticket data:', error);
+            resetCounts();
+            hideLoading();
+            
+            if (ticketTable) {
+                ticketTable.destroy();
+            }
+            
             const tbody = document.querySelector('#ticket-table tbody');
             tbody.innerHTML = `
                 <tr>
                     <td colspan="6" class="text-center text-danger">Error loading tickets</td>
                 </tr>
             `;
+            
+            ticketTable = $('#ticket-table').DataTable({
+                pageLength: 10
+            });
         });
     }
 
@@ -291,14 +383,19 @@ helper('auth');
                 return 'secondary';
         }
     }
-
-    // Event listener for engineer selection
+    
     document.getElementById('engineer-select').addEventListener('change', function() {
         loadTicketData(this.value);
+        // Update heading based on selected engineer
+        const heading = document.getElementById('page-heading');
+        if (this.value) {
+            heading.innerHTML = `<strong>Engineer Performance for ${this.value}</strong>`;
+        } else {
+            heading.innerHTML = '<strong>Engineer Performance</strong>';
+        }
     });
 
-    // Initialize the page
-    document.addEventListener('DOMContentLoaded', () => {
+    $(document).ready(function() {
         loadEngineers();
         loadTicketData();
     });

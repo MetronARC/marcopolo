@@ -173,41 +173,51 @@
         <div class="col-12 col-md-12 col-xxl-8 d-flex order-3 order-xxl-2">
             <div class="card flex-fill">
                 <div class="card-header">
-
                     <h5 class="card-title mb-0">Latest Ticket</h5>
                 </div>
-                <table class="table table-hover my-0">
-                    <thead>
-                        <tr>
-                            <th>RMA</th>
-                            <th>Customer Name</th>
-                            <th class="d-none d-xl-table-cell">Created Date</th>
-                            <th class="d-none d-xl-table-cell">Close Date</th>
-                            <th>Status</th>
-                            <th class="d-none d-md-table-cell">Engineer</th>
-                        </tr>
-                    </thead>
-                    <tbody id="latest-tickets-body">
-                        <tr id="loading-row">
-                            <td colspan="5" class="text-center">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="card-body">
+                    <table id="ticketTable" class="table table-hover my-0 display nowrap w-100">
+                        <thead>
+                            <tr>
+                                <th>RMA</th>
+                                <th>Customer Name</th>
+                                <th>Created Date</th>
+                                <th>Close Date</th>
+                                <th>Status</th>
+                                <th>Engineer</th>
+                            </tr>
+                        </thead>
+                        <tbody id="latest-tickets-body">
+                            <tr id="loading-row">
+                                <td colspan="6" class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
 </div>
 
+<!-- Add jQuery and DataTables JS -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+
 <script>
+    let ticketTable;
+
     function formatDate(dateString) {
         if (!dateString) return '-';
         const date = new Date(dateString);
-        if (isNaN(date.getTime())) return dateString; // Return original string if invalid date
+        if (isNaN(date.getTime())) return dateString;
         
         return date.toLocaleDateString('en-GB', {
             day: '2-digit',
@@ -259,53 +269,75 @@
             })
             .then(response => response.json())
             .then(data => {
-                const tbody = document.getElementById('latest-tickets-body');
-                console.log(data)
-                tbody.innerHTML = ''; // Clear loading state
-
-                if (data.length === 0) {
-                    tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="text-center">No tickets found</td>
-                    </tr>
-                `;
-                    return;
+                if (!ticketTable) {
+                    // Initialize DataTable if not already initialized
+                    ticketTable = $('#ticketTable').DataTable({
+                        responsive: true,
+                        data: data,
+                        columns: [
+                            { data: 'rma' },
+                            { data: 'customer_name' },
+                            { 
+                                data: 'created_at',
+                                render: function(data) {
+                                    return formatDate(data);
+                                }
+                            },
+                            { 
+                                data: 'close_date',
+                                render: function(data) {
+                                    return formatDate(data);
+                                }
+                            },
+                            { 
+                                data: 'ticket_status',
+                                render: function(data) {
+                                    return `<span class="badge bg-${getStatusColor(data)}">${data}</span>`;
+                                }
+                            },
+                            { 
+                                data: 'engineer',
+                                render: function(data) {
+                                    return data || '-';
+                                }
+                            }
+                        ],
+                        order: [[2, 'desc']], // Sort by created date by default
+                        pageLength: 10,
+                        language: {
+                            emptyTable: "No tickets found"
+                        }
+                    });
+                } else {
+                    // Update existing DataTable
+                    ticketTable.clear().rows.add(data).draw();
                 }
-
-                data.forEach(ticket => {
-                    const row = `
-                    <tr>
-                        <td>${ticket.rma}</td>
-                        <td>${ticket.customer_name}</td>
-                        <td class="d-none d-xl-table-cell">${formatDate(ticket.created_at)}</td>
-                        <td class="d-none d-xl-table-cell">${ticket.close_date ? formatDate(ticket.close_date) : '-'}</td>
-                        <td><span class="badge bg-${getStatusColor(ticket.ticket_status)}">${ticket.ticket_status}</span></td>
-                        <td class="d-none d-md-table-cell">${ticket.engineer || '-'}</td>
-                    </tr>
-                `;
-                    tbody.innerHTML += row;
-                });
             })
             .catch(error => {
                 console.error('Error:', error);
+                if (ticketTable) {
+                    ticketTable.clear().draw();
+                }
                 const tbody = document.getElementById('latest-tickets-body');
                 tbody.innerHTML = `
-                <tr>
-                    <td colspan="5" class="text-center text-danger">Error loading tickets</td>
-                </tr>
-            `;
+                    <tr>
+                        <td colspan="6" class="text-center text-danger">Error loading tickets</td>
+                    </tr>
+                `;
             });
     }
 
     // Initial load
-    updateStats();
-    updateLatestTickets();
-
-    // Refresh data every 30 seconds
-    setInterval(() => {
+    $(document).ready(function() {
         updateStats();
         updateLatestTickets();
-    }, 30000);
+
+        // Refresh data every 30 seconds
+        setInterval(() => {
+            updateStats();
+            updateLatestTickets();
+        }, 30000);
+    });
 </script>
 
 <script>
