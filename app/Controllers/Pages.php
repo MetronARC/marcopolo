@@ -31,6 +31,11 @@ class Pages extends BaseController
         return view('pages/engineerDetails');
     }
 
+    public function performance()
+    {
+        return view('pages/performance');
+    }
+
     public function viewTicket()
     {
         $session = session();

@@ -13,6 +13,7 @@ $routes->get('dashboard', 'Pages::index');
 $routes->get('cs', 'Pages::ticketCS');
 $routes->get('engineer', 'Pages::ticketEngineer');
 $routes->get('parts', 'Pages::parts');
+$routes->get('performance', 'Pages::performance');
 $routes->get('view_ticket', 'Pages::viewTicket');
 $routes->post('actionlogin', 'Login::actionlogin');
 $routes->get('logout', 'Login::logout', ['filter' => 'authGuard']);
