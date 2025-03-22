@@ -180,6 +180,13 @@ class Ticket extends BaseController
         }
     }
 
+    public function unfinish()
+    {
+        $ticketmod = new TicketModel();
+        $data = $ticketmod->where('status !==', 'FINISHED')->get()->getResult();
+        return json_encode($data);
+    }
+
     public function unfinish_checking()
     {
         $ticketmod = new TicketModel();
