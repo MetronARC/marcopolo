@@ -23,21 +23,32 @@ helper('auth');
         </div>
         <div class="card-body">
             <div class="row mb-3">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="input-group">
                         <select class="form-select" id="searchBrand">
                             <option value="">Select brand...</option>
                         </select>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="input-group">
-                        <input type="text" class="form-control" id="searchType" placeholder="Search by type...">
+                        <select class="form-select" id="searchType">
+                            <option value="">Select type...</option>
+                            <option value="Main Part">Main Part</option>
+                            <option value="Non Returnable">Non Returnable</option>
+                            <option value="Add up">Add up</option>
+                            <option value="Tools">Tools</option>
+                        </select>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="input-group">
-                        <input type="text" class="form-control" id="searchName" placeholder="Search by name...">
+                        <input type="text" class="form-control" id="searchPartNumber" placeholder="Search by part number...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="searchPartName" placeholder="Search by part name...">
                     </div>
                 </div>
             </div>
@@ -53,11 +64,13 @@ helper('auth');
                     <thead>
                         <tr>
                             <th>Part ID</th>
-                            <th>Device</th>
                             <th>Brand</th>
                             <th>Type</th>
-                            <th>Name</th>
-                            <th>Price</th>
+                            <th>Part Number</th>
+                            <th>Part Name</th>
+                            <th>Part SN</th>
+                            <th>Part Case No</th>
+                            <th>AWB No</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -82,10 +95,6 @@ helper('auth');
             <form id="insertPartForm">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="device" class="form-label">Device</label>
-                        <input type="text" class="form-control" id="device" name="device" required>
-                    </div>
-                    <div class="mb-3">
                         <label for="brand" class="form-label">Brand</label>
                         <select class="form-select" id="brand" name="brand" required>
                             <option value="">Select brand...</option>
@@ -93,19 +102,33 @@ helper('auth');
                     </div>
                     <div class="mb-3">
                         <label for="type" class="form-label">Type</label>
-                        <input type="text" class="form-control" id="type" name="type" required>
+                        <select class="form-select" id="type" name="type" required>
+                            <option value="">Select type...</option>
+                            <option value="Main Part">Main Part</option>
+                            <option value="Non Returnable">Non Returnable</option>
+                            <option value="Add up">Add up</option>
+                            <option value="Tools">Tools</option>
+                        </select>
                     </div>
                     <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
+                        <label for="part_number" class="form-label">Part Number</label>
+                        <input type="text" class="form-control" id="part_number" name="part_number" required>
                     </div>
                     <div class="mb-3">
-                        <label for="price" class="form-label">Price</label>
-                        <div class="input-group">
-                            <span class="input-group-text">Rp</span>
-                            <input type="text" class="form-control" id="price" name="price" required>
-                        </div>
-                        <div class="form-text">Enter price in Rupiah</div>
+                        <label for="part_name" class="form-label">Part Name</label>
+                        <input type="text" class="form-control" id="part_name" name="part_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="part_sn" class="form-label">Part SN</label>
+                        <input type="text" class="form-control" id="part_sn" name="part_sn" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="part_case_no" class="form-label">Part Case Number</label>
+                        <input type="text" class="form-control" id="part_case_no" name="part_case_no" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="awb_no" class="form-label">AWB Number</label>
+                        <input type="text" class="form-control" id="awb_no" name="awb_no" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -202,11 +225,13 @@ $(document).ready(function() {
         e.preventDefault();
 
         const formData = {
-            device: $('#device').val(),
             brand: $('#brand').val(),
             type: $('#type').val(),
-            name: $('#name').val(),
-            price: $('#price').val()
+            part_number: $('#part_number').val(),
+            part_name: $('#part_name').val(),
+            part_sn: $('#part_sn').val(),
+            part_case_no: $('#part_case_no').val(),
+            awb_no: $('#awb_no').val()
         };
 
         // Send AJAX request to insert part
@@ -228,7 +253,7 @@ $(document).ready(function() {
                     timer: 1500
                 }).then(() => {
                     // Refresh the search results if any search parameters are set
-                    if ($('#searchBrand').val() || $('#searchType').val() || $('#searchName').val()) {
+                    if ($('#searchBrand').val() || $('#searchType').val() || $('#searchPartNumber').val() || $('#searchPartName').val()) {
                         $('#searchButton').click();
                     }
                 });
@@ -348,9 +373,10 @@ $(document).ready(function() {
     $('#searchButton').on('click', function() {
         const brand = $('#searchBrand').val();
         const type = $('#searchType').val();
-        const name = $('#searchName').val();
+        const partNumber = $('#searchPartNumber').val();
+        const partName = $('#searchPartName').val();
 
-        if (!brand && !type && !name) {
+        if (!brand && !type && !partNumber && !partName) {
             Swal.fire({
                 icon: 'warning',
                 title: 'Warning',
@@ -371,8 +397,9 @@ $(document).ready(function() {
                     const filteredData = allData.filter(part => {
                         const matchBrand = !brand || part.brand.toLowerCase().includes(brand.toLowerCase());
                         const matchType = !type || part.type.toLowerCase().includes(type.toLowerCase());
-                        const matchName = !name || part.name.toLowerCase().includes(name.toLowerCase());
-                        return matchBrand && matchType && matchName;
+                        const matchPartNumber = !partNumber || part.part_number.toLowerCase().includes(partNumber.toLowerCase());
+                        const matchPartName = !partName || part.part_name.toLowerCase().includes(partName.toLowerCase());
+                        return matchBrand && matchType && matchPartNumber && matchPartName;
                     });
                     
                     $('#searchPartsTable tbody').empty();
@@ -389,7 +416,7 @@ $(document).ready(function() {
                             if (part.status === 'STOCK') {
                                 actionButton = `<button class="btn btn-sm btn-primary assignToTicket" 
                                     data-part-id="${part.part_id}"
-                                    data-part-name="${part.name}">Assign to Ticket</button>`;
+                                    data-part-name="${part.part_name}">Assign to Ticket</button>`;
                             } else {
                                 actionButton = `<span class="badge bg-secondary">No actions available</span>`;
                             }
@@ -397,11 +424,13 @@ $(document).ready(function() {
                             $('#searchPartsTable tbody').append(`
                                 <tr>
                                     <td>${part.part_id || ''}</td>
-                                    <td>${part.device || ''}</td>
                                     <td>${part.brand || ''}</td>
                                     <td>${part.type || ''}</td>
-                                    <td>${part.name || ''}</td>
-                                    <td>${part.price ? 'Rp ' + parseFloat(part.price).toLocaleString('id-ID') : ''}</td>
+                                    <td>${part.part_number || ''}</td>
+                                    <td>${part.part_name || ''}</td>
+                                    <td>${part.part_sn || ''}</td>
+                                    <td>${part.part_case_no || ''}</td>
+                                    <td>${part.awb_no || ''}</td>
                                     <td>${part.status || ''}</td>
                                     <td>${actionButton}</td>
                                 </tr>

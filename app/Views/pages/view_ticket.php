@@ -429,19 +429,19 @@ document.addEventListener('DOMContentLoaded', function() {
                                 ${assignedParts.map(part => `
                                     <tr>
                                         <td>${part.part_id}</td>
-                                        <td>${part.name || '-'}</td>
+                                        <td>${part.part_name || '-'}</td>
                                         <td>${part.brand || '-'}</td>
                                         <td>${part.type || '-'}</td>
                                         <td class="text-center">
                                             <div class="btn-group" role="group">
                                                 <button class="btn btn-success btn-sm use-part-btn" 
                                                     data-part-id="${part.part_id}"
-                                                    data-part-name="${part.name || '-'}">
+                                                    data-part-name="${part.part_name || '-'}">
                                                     Use
                                                 </button>
                                                 <button class="btn btn-danger btn-sm cancel-part-btn" 
                                                     data-part-id="${part.part_id}"
-                                                    data-part-name="${part.name || '-'}">
+                                                    data-part-name="${part.part_name || '-'}">
                                                     Cancel
                                                 </button>
                                             </div>
