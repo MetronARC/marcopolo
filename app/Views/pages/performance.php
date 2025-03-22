@@ -12,16 +12,113 @@ helper('auth');
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h3 mb-0"><strong>Ticket</strong> Data</h1>
+    <div style="width: 200px;">
+        <select class="form-select" id="engineer-select">
+            <option value="">All Engineers</option>
+        </select>
+    </div>
 </div>
 
-<div class="row mb-3">
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Filter by Engineer</h5>
-                <select class="form-select" id="engineer-select">
-                    <option value="">All Engineers</option>
-                </select>
+<div class="w-100 mb-3">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col mt-0">
+                            <h5 class="card-title">New Ticket</h5>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat text-primary">
+                                <i class="align-middle" data-feather="file-plus"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h1 class="mt-1 mb-3" id="new-ticket-count">0</h1>
+                    <div class="mb-0">
+                        <span class="text-muted">Unit</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col mt-0">
+                            <h5 class="card-title">In Progress</h5>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat text-primary">
+                                <i class="align-middle" data-feather="activity"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h1 class="mt-1 mb-3" id="in-progress-count">0</h1>
+                    <div class="mb-0">
+                        <span class="text-muted">Unit</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col mt-0">
+                            <h5 class="card-title">Wait For Part</h5>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat text-primary">
+                                <i class="align-middle" data-feather="cpu"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h1 class="mt-1 mb-3" id="wait-part-count">0</h1>
+                    <div class="mb-0">
+                        <span class="text-muted">Unit</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col mt-0">
+                            <h5 class="card-title">Wait For Escalation</h5>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat text-primary">
+                                <i class="align-middle" data-feather="send"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h1 class="mt-1 mb-3" id="escalation-count">0</h1>
+                    <div class="mb-0">
+                        <span class="text-muted">Unit</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col mt-0">
+                            <h5 class="card-title">Ready To Pickup</h5>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat text-primary">
+                                <i class="align-middle" data-feather="truck"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <h1 class="mt-1 mb-3" id="ready-pickup-count">0</h1>
+                    <div class="mb-0">
+                        <span class="text-muted">Unit</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -63,7 +160,7 @@ helper('auth');
 
     // Function to load engineers into dropdown
     function loadEngineers() {
-        fetch('/engineers/list', {
+        fetch('/user/get/ENGINEER', {
             method: 'GET'
         })
         .then(response => response.json())
@@ -92,6 +189,29 @@ helper('auth');
         .then(data => {
             console.log('Fetched ticket data:');
             console.log(JSON.stringify(data, null, 2));
+
+            // Update ticket counts
+            const statusCounts = {
+                'NEW': 0,
+                'CHECKING': 0,
+                'WAIT FOR PART': 0,
+                'WAIT FOR ESCALATION': 0,
+                'WAIT FOR PICKUP': 0
+            };
+            
+            data.forEach(ticket => {
+                if (statusCounts.hasOwnProperty(ticket.ticket_status)) {
+                    statusCounts[ticket.ticket_status]++;
+                }
+            });
+            
+            document.getElementById('new-ticket-count').textContent = statusCounts['NEW'] || 0;
+            document.getElementById('in-progress-count').textContent = statusCounts['CHECKING'] || 0;
+            document.getElementById('wait-part-count').textContent = statusCounts['WAIT FOR PART'] || 0;
+            document.getElementById('escalation-count').textContent = statusCounts['WAIT FOR ESCALATION'] || 0;
+            document.getElementById('ready-pickup-count').textContent = statusCounts['WAIT FOR PICKUP'] || 0;
+
+            // Update ticket table
             const tbody = document.querySelector('#ticket-table tbody');
             tbody.innerHTML = '';
 
