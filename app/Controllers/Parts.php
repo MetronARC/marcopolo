@@ -24,8 +24,9 @@ class Parts extends BaseController
             'part_name'     => $this->request->getVar('part_name'),
             'part_sn'       => $this->request->getVar('part_sn'),
             'part_case_no'  => $this->request->getVar('part_case_no'),
+            'rma'           => $this->request->getVar('part_case_no'),
             'awb_no'        => $this->request->getVar('awb_no'),
-            'status'        => 'STOCK',
+            'status'        => 'ASSIGNED',
             'created_at'    => date('Y-m-d H:i:s'),
         ];
 
@@ -33,7 +34,7 @@ class Parts extends BaseController
         $partmod->save($data);
 
         $logmod = new UserlogModel();
-        $log = [
+        $loginsert = [
             'userid'         => session('userid'),
             'email'          => session('email'),
             'name'           => session('name'),
@@ -41,7 +42,27 @@ class Parts extends BaseController
             'created_at'     => date('Y-m-d H:i:s'),
             'description'    => json_encode($data),
         ];
-        $logmod->insert($log);
+        $logmod->insert($loginsert);
+
+        $ticketlog = [
+            'rma' => $this->request->getVar('rma'),
+            'note' => 'Part '.$this->request->getVar('part_name').' Assigned',
+            'user' => $this->request->getVar('user'),
+            'created_at' => date('Y-m-d H:i:s')
+        ];
+
+        $ticketlogmod = new TicketlogModel();
+        $ticketlogmod->save($ticketlog);
+
+        $logassign = [
+            'userid'         => session('userid'),
+            'email'          => session('email'),
+            'name'           => session('name'),
+            'action'         => '/parts/assign',
+            'created_at'     => date('Y-m-d H:i:s'),
+            'description'    => json_encode($ticketlog),
+        ];
+        $logmod->insert($logassign);
 
         return $this->respond(['message' => 'Insert sparepart successfully!'], 200);
     }
