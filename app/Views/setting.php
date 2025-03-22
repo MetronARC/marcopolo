@@ -73,7 +73,7 @@
                     <button class="btn btn-success float-end me-2" onclick="opensearchlog()"><i class="fa-solid fa-magnifying-glass"></i> Search Log</button>
                 </div>
                 <div class="card-body">
-                    <table class="table table-striped table-bordered">
+                    <table class="table table-striped table-bordered" id="userlogtbl">
                         <thead>
                             <tr>
                                 <th>Date</th>
@@ -459,25 +459,25 @@
                 let data = JSON.parse(resp)
                 console.log(data)
                 if (data.length > 0) {
-                    $('#logdata').empty()
+                    let datatable = new DataTable('#userlogtbl');
+                    datatable.clear().draw(); // Clear existing table data
+
                     data.forEach(e => {
-                        $('#logdata').append(`
-                        <tr>
-                            <td>${e.created_at}</td>
-                            <td>${e.userid}</td>
-                            <td>${e.name}</td>
-                            <td>${e.email}</td>
-                            <td>${e.action}</td>
-                            <td>
-                                <button class="btn btn-sm btn-info" onclick="viewlog('${e.id}')">View Log</button>
-                            </td>
-                        <tr>
-                        `)
+                        datatable.row.add([
+                            e.created_at,
+                            e.userid,
+                            e.name,
+                            e.email,
+                            e.action,
+                            `<button class="btn btn-sm btn-info" onclick="viewlog('${e.id}')">View Log</button>`
+                        ]);
                     });
+
+                    datatable.draw();
                 } else {
                     $('#logdata').empty().append(`
                         <tr>
-                            <td colspan="5" class="text-center">Data Empty</td>
+                            <td colspan="6" class="text-center">Data Empty</td>
                         </tr>
                     `)
                 }
@@ -508,6 +508,7 @@
                     <tr>
                 `)
             });
+
         } else {
             $('#logdata').empty().append(`
                 <tr>
@@ -554,9 +555,9 @@
 
     function viewlog(id) {
         $.ajax({
-            url: '/user/get/log/'+id,
+            url: '/user/get/log/' + id,
             type: 'GET',
-            success: function(response){
+            success: function(response) {
                 let data = JSON.parse(response)
                 let desc = JSON.parse(data.description)
                 $('#v_user').empty().append(data.name);
