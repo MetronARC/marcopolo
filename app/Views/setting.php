@@ -81,6 +81,7 @@
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Action</th>
+                                <th>View Data</th>
                             </tr>
                         </thead>
                         <tbody id="logdata">
@@ -118,7 +119,7 @@
                             <option selected disabled>User Type</option>
                             <option value="CS">Customer Service</option>
                             <option value="ADMIN">Admin</option>
-                            <option value="TECHNICIAN">Technician</option>
+                            <option value="ENGINEER">Engineer</option>
                             <option value="MANAGER">Manager</option>
                         </select>
                         <label for="floatingSelect">Select Type</label>
@@ -179,6 +180,44 @@
                         </div>
                     </div>
                 </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary float-end" onclick="submitsearch()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="viewlogmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">View Log</h1>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <td style="width: 30%;">User</td>
+                            <td id="v_user"></td>
+                        </tr>
+                        <tr>
+                            <td style="width: 30%;">Datetime</td>
+                            <td id="v_date"></td>
+                        </tr>
+                        <tr>
+                            <td style="width: 30%;">Action</td>
+                            <td id="v_action"></td>
+                        </tr>
+                        <tr>
+                            <td style="width: 30%;">Data</td>
+                            <td style="background-color: black;">
+                                <pre><code id="v_data" style="color: white;"></code></pre>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary float-end" onclick="submitsearch()">Submit</button>
@@ -429,6 +468,9 @@
                             <td>${e.name}</td>
                             <td>${e.email}</td>
                             <td>${e.action}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info" onclick="viewlog('${e.id}')">View Log</button>
+                            </td>
                         <tr>
                         `)
                     });
@@ -506,6 +548,22 @@
             success: function(resp) {
                 $('#searchlogmodal').modal('hide')
                 fetchsearchlog(resp)
+            }
+        })
+    }
+
+    function viewlog(id) {
+        $.ajax({
+            url: '/user/get/log/'+id,
+            type: 'GET',
+            success: function(response){
+                let data = JSON.parse(response)
+                let desc = JSON.parse(data.description)
+                $('#v_user').empty().append(data.name);
+                $('#v_date').empty().append(data.created_at);
+                $('#v_action').empty().append(data.action);
+                $('#v_data').empty().append(JSON.stringify(desc, null, 4));
+                $('#viewlogmodal').modal('show');
             }
         })
     }

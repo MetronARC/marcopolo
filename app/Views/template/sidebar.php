@@ -1,7 +1,7 @@
 <aside class="sidebar js-sidebar">
         <div class="sidebar-content js-simplebar">
-          <a class="sidebar-brand" href="index.html">
-            <span class="align-middle">AppDesk</span>
+          <a class="sidebar-brand" href="/">
+            <span class="align-middle">PT. Karya Mura Niaga</span>
           </a>
 
           <ul class="sidebar-nav">
