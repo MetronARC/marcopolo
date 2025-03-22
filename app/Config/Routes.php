@@ -26,7 +26,7 @@ $routes->group('user', static function ($routes) {
     $routes->get('get/(:segment)', 'Users::get/$1');
     $routes->get('getall', 'Users::getall');
     $routes->post('create', 'Users::create');
-    $routes->post('changepassword', 'Users::changepassword');
+    $routes->post('changepassword', 'Users::changepassword', ['filter' => 'authGuard']);
     $routes->post('changetype', 'Users::changetype');
     $routes->post('delete', 'Users::delete');
     $routes->post('view', 'Users::view');

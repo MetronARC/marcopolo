@@ -64,6 +64,7 @@ class Users extends BaseController
         return $this->respond(['message' => 'Change password successfully!'], 200);
     }
 
+
     public function changetype()
     {
         $data = [
@@ -98,7 +99,7 @@ class Users extends BaseController
     public function view()
     {
         $usermod = new UserModel();
-        $data = $usermod->where('user_id', $this->request->getVar('user_id'))->get()->getRow();
+        $data = $usermod->where('email', $this->request->getVar('email'))->get()->getRow();
 
         return json_encode($data);
     }
@@ -107,21 +108,21 @@ class Users extends BaseController
     {
         $usermod = new UserModel();
         $lastdata = $usermod->orderBy('created_at', 'DESC')->limit(1)->get()->getRow();
-        if($lastdata){
+        if ($lastdata) {
             $lastid = $lastdata->user_id;
             //U + [2 digit year] + [3 digit sequence]
             $lastyear = substr($lastid, 1, 2);
             $lastseq = (int)substr($lastid, 3, 4);
-            if(date('y') == $lastyear){
+            if (date('y') == $lastyear) {
                 $newseq = $lastseq + 1;
-                $newid = 'U' . $lastyear . sprintf("%04d", $newseq); 
+                $newid = 'U' . $lastyear . sprintf("%04d", $newseq);
                 return $newid;
             } else {
-                $newid = 'U' . date('y') . sprintf("%04d", 1); 
+                $newid = 'U' . date('y') . sprintf("%04d", 1);
                 return $newid;
             }
         } else {
-            $newid = 'U' . date('y') . sprintf("%04d", 1); 
+            $newid = 'U' . date('y') . sprintf("%04d", 1);
             return $newid;
         }
     }
@@ -144,9 +145,15 @@ class Users extends BaseController
     public function searchlog()
     {
         $userlogmod = new UserlogModel();
-        if($this->request->getVar('user')){$userlogmod->where('userid', $this->request->getVar('user'));}
-        if($this->request->getVar('start')){$userlogmod->where('created_at >=', $this->request->getVar('start'));}
-        if($this->request->getVar('end')){$userlogmod->where('created_at <=', $this->request->getVar('end'));}
+        if ($this->request->getVar('user')) {
+            $userlogmod->where('userid', $this->request->getVar('user'));
+        }
+        if ($this->request->getVar('start')) {
+            $userlogmod->where('created_at >=', $this->request->getVar('start'));
+        }
+        if ($this->request->getVar('end')) {
+            $userlogmod->where('created_at <=', $this->request->getVar('end'));
+        }
         $userlogmod->orderBy('created_at', 'DESC');
         $data = $userlogmod->get()->getResult();
 
@@ -157,7 +164,7 @@ class Users extends BaseController
     {
         $usermod = new UserModel();
         $data = $usermod->where('email', $this->request->getVar('email'))->get()->getResult();
-        if($data){
+        if ($data) {
             return 'false';
         } else {
             return 'true';

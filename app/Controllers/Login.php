@@ -74,6 +74,7 @@ class Login extends BaseController
         }
     }
 
+
     public function logout()
     {
         $logmod = new UserlogModel();

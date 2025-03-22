@@ -64,7 +64,8 @@
 					<div class="d-table-cell align-middle">
 
 						<div class="text-center mt-4">
-							<h1 class="h2">AppDesk v1.0</h1>
+							<img class="img-fluid" src="/assets/img/logo.png" style="width: 80px; height:auto;">
+							<h1 class="h2">PT. Karya Mura Niaga</h1>
 							<p class="lead">
 								Sign in to your account to continue
 							</p>
@@ -114,14 +115,38 @@
 						password: password
 					},
 					success: function(response) {
-						if (response.indexOf('login') !== -1) {
-							$('#loginForm')[0].submit();
-						} else {
-							if (email === password) {
-								var passwordModal = new bootstrap.Modal(document.getElementById('passwordChangeModal'));
-								passwordModal.show();
+						try {
+							const jsonResponse = JSON.parse(response);
+							if (jsonResponse.status === 'error') {
+								Swal.fire({
+									title: "Error!",
+									text: jsonResponse.message,
+									icon: "error"
+								});
+								return;
+							}
+						} catch (e) {
+							// Not JSON, handle as before
+							if (response.indexOf('login') !== -1) {
+								$('#loginForm')[0].submit();
 							} else {
-								window.location.href = '/';
+								if (email === password) {
+									$.ajax({
+										url: 'user/view',
+										method: 'POST',
+										data: {
+											email: email
+										},
+										success: function(userResponse) {
+											const userData = JSON.parse(userResponse);
+											userId = userData.user_id;
+											var passwordModal = new bootstrap.Modal(document.getElementById('passwordChangeModal'));
+											passwordModal.show();
+										}
+									});
+								} else {
+									window.location.href = '/';
+								}
 							}
 						}
 					},
@@ -151,12 +176,10 @@
 				$.ajax({
 					url: 'user/changepassword',
 					method: 'POST',
-					dataType: 'json',
-					contentType: 'application/json',
-					data: JSON.stringify({
+					data: {
 						newpassword: newPassword,
-						user_id: '<?= session()->get('userid') ?>'
-					}),
+						user_id: userId
+					},
 					success: function(response) {
 						if (response.message === 'Change password successfully!') {
 							Swal.fire({
