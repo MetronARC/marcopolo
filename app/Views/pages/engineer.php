@@ -139,32 +139,36 @@ helper('auth');
 </div>
 
 <div class="row">
-    <div class="col-12 d-flex">
-        <div class="card flex-fill">
-            <div class="card-header">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Latest Tickets</h5>
             </div>
-            <table class="table table-hover my-0" id="ticket-table">
-                <thead>
-                    <tr>
-                        <th>RMA</th>
-                        <th>Customer Name</th>
-                        <th class="d-none d-xl-table-cell">Created Date</th>
-                        <th>Status</th>
-                        <th class="d-none d-md-table-cell">Engineer</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="6" class="text-center">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="card-body px-4 py-3">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped display nowrap w-100" id="ticket-table" style="margin: 0 !important;">
+                        <thead>
+                            <tr>
+                                <th>RMA</th>
+                                <th>Customer Name</th>
+                                <th class="d-none d-xl-table-cell">Created Date</th>
+                                <th>Status</th>
+                                <th class="d-none d-md-table-cell">Engineer</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -189,11 +193,14 @@ helper('auth');
 
                 ticketTable = $('#ticket-table').DataTable({
                     data: data,
+                    responsive: true,
+                    processing: true,
                     columns: [
-                        { data: 'rma' },
-                        { data: 'customer_name' },
+                        { data: 'rma', width: '15%' },
+                        { data: 'customer_name', width: '25%' },
                         { 
                             data: 'created_at',
+                            width: '15%',
                             className: 'd-none d-xl-table-cell',
                             render: function(data) {
                                 return formatDate(data);
@@ -201,16 +208,20 @@ helper('auth');
                         },
                         { 
                             data: 'ticket_status',
+                            width: '15%',
                             render: function(data) {
                                 return `<span class="badge bg-${getStatusColor(data)}">${data}</span>`;
                             }
                         },
                         { 
                             data: 'engineer',
+                            width: '15%',
                             className: 'd-none d-md-table-cell'
                         },
                         { 
                             data: 'rma',
+                            width: '15%',
+                            orderable: false,
                             render: function(data) {
                                 return `
                                     <form action="/set_view_ticket" method="POST" class="d-inline">
@@ -222,6 +233,10 @@ helper('auth');
                         }
                     ],
                     pageLength: 10,
+                    order: [[2, 'desc']], // Sort by created date by default
+                    dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+                         '<"row"<"col-sm-12"tr>>' +
+                         '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
                     language: {
                         search: "Search:",
                         lengthMenu: "Show _MENU_ entries",
@@ -231,7 +246,8 @@ helper('auth');
                             last: "Last",
                             next: "Next",
                             previous: "Previous"
-                        }
+                        },
+                        processing: '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>'
                     }
                 });
             })
@@ -275,6 +291,10 @@ helper('auth');
 
     $(document).ready(function() {
         loadTicketData();
+
+        // Add DataTables wrapper styling after initialization
+        $('#ticket-table_wrapper .dataTables_length, #ticket-table_wrapper .dataTables_filter').addClass('mb-3');
+        $('#ticket-table_wrapper td, #ticket-table_wrapper th').addClass('px-3 py-2');
     });
 </script>
 

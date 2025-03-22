@@ -459,25 +459,26 @@
                 let data = JSON.parse(resp)
                 console.log(data)
                 if (data.length > 0) {
-                    let datatable = new DataTable('#userlogtbl');
-                    datatable.clear().draw(); // Clear existing table data
-
+                    $('#logdata').empty()
                     data.forEach(e => {
-                        datatable.row.add([
-                            e.created_at,
-                            e.userid,
-                            e.name,
-                            e.email,
-                            e.action,
-                            `<button class="btn btn-sm btn-info" onclick="viewlog('${e.id}')">View Log</button>`
-                        ]);
+                        $('#logdata').append(`
+                        <tr>
+                            <td>${e.created_at}</td>
+                            <td>${e.userid}</td>
+                            <td>${e.name}</td>
+                            <td>${e.email}</td>
+                            <td>${e.action}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info" onclick="viewlog('${e.id}')">View Log</button>
+                            </td>
+                        <tr>
+                        `)
                     });
-
-                    datatable.draw();
+                    
                 } else {
                     $('#logdata').empty().append(`
                         <tr>
-                            <td colspan="6" class="text-center">Data Empty</td>
+                            <td colspan="5" class="text-center">Data Empty</td>
                         </tr>
                     `)
                 }

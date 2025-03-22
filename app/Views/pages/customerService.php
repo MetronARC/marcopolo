@@ -114,7 +114,7 @@ helper('auth');
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="warranty_date" class="form-label">Warranty Date</label>
-                            <input type="date" class="form-control" id="warranty_date" name="warranty_date">
+                            <input type="text" class="form-control" id="warranty_date" name="warranty_date" placeholder="Enter warranty date">
                         </div>
                         <div class="col-md-6">
                             <label for="device_condition" class="form-label">Device Status</label>

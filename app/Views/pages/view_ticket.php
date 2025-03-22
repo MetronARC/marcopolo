@@ -48,7 +48,6 @@ helper('auth');
 </div>
 
 <div class="row">
-    <!-- Ticket Details Card -->
     <div class="col-12 col-xl-8 mb-4">
         <div class="card">
             <div class="card-header">
@@ -66,7 +65,6 @@ helper('auth');
         </div>
     </div>
 
-    <!-- Customer Details Card -->
     <div class="col-12 col-xl-4 mb-4">
         <div class="card">
             <div class="card-header">
@@ -84,7 +82,6 @@ helper('auth');
         </div>
     </div>
 
-    <!-- Device Details Card -->
     <div class="col-12 col-xl-8 mb-4">
         <div class="card">
             <div class="card-header">
@@ -102,7 +99,6 @@ helper('auth');
         </div>
     </div>
 
-    <!-- Status Details Card -->
     <div class="col-12 col-xl-4 mb-4">
         <div class="card">
             <div class="card-header">
@@ -120,9 +116,7 @@ helper('auth');
         </div>
     </div>
 
-    <!-- History Section -->
     <div class="row">
-        <!-- Ticket History Card -->
         <div class="col-12 col-xl-6">
             <div class="card">
                 <div class="card-header">
@@ -140,7 +134,6 @@ helper('auth');
             </div>
         </div>
 
-        <!-- Parts History Card -->
         <div class="col-12 col-xl-6">
             <div class="card">
                 <div class="card-header">
@@ -160,7 +153,6 @@ helper('auth');
     </div>
 </div>
 
-<!-- Use Part Modal -->
 <div class="modal fade" id="usePartModal" tabindex="-1" aria-labelledby="usePartModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -184,7 +176,6 @@ helper('auth');
     </div>
 </div>
 
-<!-- Cancel Part Modal -->
 <div class="modal fade" id="cancelPartModal" tabindex="-1" aria-labelledby="cancelPartModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -252,7 +243,6 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Ticket Details:');
             console.log(JSON.stringify(data, null, 2));
             
-            // Ticket Details
             document.getElementById('ticket-details').innerHTML = `
                 <div class="row g-3">
                     <div class="col-md-6">
@@ -278,7 +268,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             `;
 
-            // Customer Details
             document.getElementById('customer-details').innerHTML = `
                 <div class="row g-3">
                     <div class="col-12">
@@ -300,7 +289,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             `;
 
-            // Device Details
             document.getElementById('device-details').innerHTML = `
                 <div class="row g-3">
                     <div class="col-md-4">
@@ -334,7 +322,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             `;
 
-            // Status Details
             document.getElementById('status-details').innerHTML = `
                 <div class="row g-3">
                     <div class="col-12">
@@ -352,7 +339,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             `;
 
-            // Ticket Logs
             const logsHtml = data.log.map(log => `
                 <div class="timeline-item">
                     <div class="row">
