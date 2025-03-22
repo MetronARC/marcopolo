@@ -170,8 +170,14 @@ helper('auth');
 </div>
 
 <script>
+    let ticketTable;
+
     function loadTicketData() {
         const user = '<?= session('name') ?>';
+
+        if ($.fn.DataTable.isDataTable('#ticket-table')) {
+            $('#ticket-table').DataTable().destroy();
+        }
 
         fetch(`/ticket/unfinish/engineer?user=${user}`, {
                 method: 'GET',
@@ -180,43 +186,71 @@ helper('auth');
             .then(data => {
                 console.log('Fetched ticket data:');
                 console.log(JSON.stringify(data, null, 2));
-                const tbody = document.querySelector('#ticket-table tbody');
-                tbody.innerHTML = '';
 
-                if (data.length === 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="text-center">No tickets found</td>
-                        </tr>
-                    `;
-                } else {
-                    data.forEach(ticket => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${ticket.rma}</td>
-                            <td>${ticket.customer_name}</td>
-                            <td class="d-none d-xl-table-cell">${formatDate(ticket.created_at)}</td>
-                            <td><span class="badge bg-${getStatusColor(ticket.ticket_status)}">${ticket.ticket_status}</span></td>
-                            <td class="d-none d-md-table-cell">${ticket.engineer}</td>
-                            <td>
-                                <form action="/set_view_ticket" method="POST" class="d-inline">
-                                    <input type="hidden" name="rma" value="${ticket.rma}">
-                                    <button type="submit" class="btn btn-sm btn-info">View</button>
-                                </form>
-                            </td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                }
+                ticketTable = $('#ticket-table').DataTable({
+                    data: data,
+                    columns: [
+                        { data: 'rma' },
+                        { data: 'customer_name' },
+                        { 
+                            data: 'created_at',
+                            className: 'd-none d-xl-table-cell',
+                            render: function(data) {
+                                return formatDate(data);
+                            }
+                        },
+                        { 
+                            data: 'ticket_status',
+                            render: function(data) {
+                                return `<span class="badge bg-${getStatusColor(data)}">${data}</span>`;
+                            }
+                        },
+                        { 
+                            data: 'engineer',
+                            className: 'd-none d-md-table-cell'
+                        },
+                        { 
+                            data: 'rma',
+                            render: function(data) {
+                                return `
+                                    <form action="/set_view_ticket" method="POST" class="d-inline">
+                                        <input type="hidden" name="rma" value="${data}">
+                                        <button type="submit" class="btn btn-sm btn-info">View</button>
+                                    </form>
+                                `;
+                            }
+                        }
+                    ],
+                    pageLength: 10,
+                    language: {
+                        search: "Search:",
+                        lengthMenu: "Show _MENU_ entries",
+                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                        paginate: {
+                            first: "First",
+                            last: "Last",
+                            next: "Next",
+                            previous: "Previous"
+                        }
+                    }
+                });
             })
             .catch(error => {
                 console.error('Error loading ticket data:', error);
+                if ($.fn.DataTable.isDataTable('#ticket-table')) {
+                    $('#ticket-table').DataTable().destroy();
+                }
+                
                 const tbody = document.querySelector('#ticket-table tbody');
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="6" class="text-center text-danger">Error loading tickets</td>
                     </tr>
                 `;
+                
+                ticketTable = $('#ticket-table').DataTable({
+                    pageLength: 10
+                });
             });
     }
 
@@ -239,7 +273,9 @@ helper('auth');
         }
     }
 
-    document.addEventListener('DOMContentLoaded', loadTicketData);
+    $(document).ready(function() {
+        loadTicketData();
+    });
 </script>
 
 <script>

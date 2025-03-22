@@ -3,6 +3,7 @@ helper('auth');
 ?>
 
 <?= $this->extend('template/index') ?>
+
 <?= $this->section('page-content') ?>
 
 <div class="container-fluid">
@@ -53,7 +54,7 @@ helper('auth');
                 </div>
             </div>
             <div class="table-responsive">
-                <table class="table table-bordered" id="searchPartsTable" width="100%" cellspacing="0">
+                <table class="table table-bordered table-striped dt-responsive nowrap" id="searchPartsTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th>Part ID</th>
@@ -65,11 +66,10 @@ helper('auth');
                             <th>Part Case No</th>
                             <th>AWB No</th>
                             <th>Status</th>
-                            <th>Actions</th>
+                            <!-- <th>Actions</th> -->
                         </tr>
                     </thead>
                     <tbody>
-                        
                     </tbody>
                 </table>
             </div>
@@ -117,7 +117,9 @@ helper('auth');
                     </div>
                     <div class="mb-3">
                         <label for="part_case_no" class="form-label">Part Case Number</label>
-                        <input type="text" class="form-control" id="part_case_no" name="part_case_no" required>
+                        <select class="form-select" id="part_case_no" name="part_case_no" required>
+                            <option value="">Select case number...</option>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="awb_no" class="form-label">AWB Number</label>
@@ -164,146 +166,175 @@ helper('auth');
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script>
-$(document).ready(function() {
-    const insertModal = new bootstrap.Modal(document.getElementById('insertPartModal'));
-    const assignTicketModal = new bootstrap.Modal(document.getElementById('assignTicketModal'));
-    const user = '<?= session('name') ?>';
+    $(document).ready(function() {
+        const insertModal = new bootstrap.Modal(document.getElementById('insertPartModal'));
+        const assignTicketModal = new
+        bootstrap.Modal(document.getElementById('assignTicketModal'));
+        const user = '<?= session('name') ?>';
 
-    // Load brands for dropdown
-    function loadBrands() {
-        $.ajax({
-            url: '<?= base_url('brand/get') ?>',
-            type: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                const brandDropdowns = $('#brand, #searchBrand');
-                brandDropdowns.find('option:not(:first)').remove(); // Clear existing options except the first one
-                
-                response.forEach(function(brand) {
-                    brandDropdowns.append(`<option value="${brand.brand}">${brand.brand}</option>`);
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error('Failed to load brands:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: 'Failed to load brands: ' + error,
-                    confirmButtonColor: '#d33'
-                });
-            }
-        });
-    }
+        // Load brands for dropdown
+        function loadBrands() {
+            $.ajax({
+                url: '<?= base_url('brand/get') ?>',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    const brandDropdowns = $('#brand, #searchBrand');
+                    brandDropdowns.find('option:not(:first)').remove(); // Clear existing options except the first one
 
-    // Load brands when page loads
-    loadBrands();
-
-    function getStatusColor(status) {
-        switch (status) {
-            case 'CHECKING':
-                return 'warning';
-            case 'WAIT FOR PART':
-                return 'info';
-            case 'WAIT FOR PICKUP':
-                return 'success';
-            default:
-                return 'secondary';
-        }
-    }
-
-    $('#insertPartForm').on('submit', function(e) {
-        e.preventDefault();
-
-        const formData = {
-            brand: $('#brand').val(),
-            type: $('#type').val(),
-            part_number: $('#part_number').val(),
-            part_name: $('#part_name').val(),
-            part_sn: $('#part_sn').val(),
-            part_case_no: $('#part_case_no').val(),
-            awb_no: $('#awb_no').val()
-        };
-
-        console.log('Sending form data:', formData);
-
-        // Send AJAX request to insert part
-        $.ajax({
-            url: '<?= base_url('parts/insert') ?>',
-            type: 'POST',
-            data: formData,
-            dataType: 'json',
-            success: function(response) {
-                console.log('Success response:', response);
-                // Close the modal and reset form
-                insertModal.hide();
-                $('#insertPartForm')[0].reset();
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: response.message,
-                    showConfirmButton: true,
-                    timer: 1500
-                }).then(() => {
-                    // Refresh the search results if any search parameters are set
-                    if ($('#searchType').val() || $('#searchPartName').val() || $('#searchPartCaseNo').val()) {
-                        $('#searchButton').click();
-                    }
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error('Error details:', {
-                    status: xhr.status,
-                    statusText: xhr.statusText,
-                    responseText: xhr.responseText,
-                    error: error
-                });
-
-                let errorMessage = 'Failed to insert part';
-                try {
-                    const response = JSON.parse(xhr.responseText);
-                    if (response.message) {
-                        errorMessage = response.message;
-                    }
-                } catch (e) {
-                    errorMessage += ': ' + error;
+                    response.forEach(function(brand) {
+                        brandDropdowns.append(`<option value="${brand.brand}">${brand.brand}</option>`);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to load brands:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to load brands: ' + error,
+                        confirmButtonColor: '#d33'
+                    });
                 }
+            });
+        }
 
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: errorMessage,
-                    confirmButtonColor: '#d33'
-                });
+        // Load brands when page loads
+        loadBrands();
+
+        // Load part case numbers for dropdown
+        function loadPartCaseNumbers() {
+            $.ajax({
+                url: '<?= base_url('ticket/unfinish/part') ?>',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    const caseNoDropdown = $('#part_case_no');
+                    caseNoDropdown.find('option:not(:first)').remove(); // Clear existing options except the first one
+
+                    response.forEach(function(ticket) {
+                        const optionText = `${ticket.rma || ''} / ${ticket.service_no || ''} / ${ticket.sn || ''} / ${ticket.brand || ''} / ${ticket.device || ''}`;
+                        caseNoDropdown.append(`<option value="${ticket.rma}">${optionText}</option>`);
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to load part case numbers:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to load part case numbers: ' + error,
+                        confirmButtonColor: '#d33'
+                    });
+                }
+            });
+        }
+
+        // Load part case numbers when page loads
+        loadPartCaseNumbers();
+
+        function getStatusColor(status) {
+            switch (status) {
+                case 'CHECKING':
+                    return 'warning';
+                case 'WAIT FOR PART':
+                    return 'info';
+                case 'WAIT FOR PICKUP':
+                    return 'success';
+                default:
+                    return 'secondary';
             }
-        });
-    });
+        }
 
-    // Handle Assign to Ticket button click
-    $(document).on('click', '.assignToTicket', function() {
-        const partId = $(this).data('part-id');
-        const partName = $(this).data('part-name');
-        
-        // Load unfinished tickets
-        $.ajax({
-            url: '<?= base_url('ticket/unfinish/engineer') ?>?user=<?= session('name') ?>',
-            type: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                $('#ticketsTable tbody').empty();
-                
-                if (!response || response.length === 0) {
-                    $('#ticketsTable tbody').append(`
+        $('#insertPartForm').on('submit', function(e) {
+            e.preventDefault();
+
+            const formData = {
+                brand: $('#brand').val(),
+                type: $('#type').val(),
+                part_number: $('#part_number').val(),
+                part_name: $('#part_name').val(),
+                part_sn: $('#part_sn').val(),
+                part_case_no: $('#part_case_no').val(),
+                awb_no: $('#awb_no').val()
+            };
+
+            console.log('Sending form data:', formData);
+
+            // Send AJAX request to insert part
+            $.ajax({
+                url: '<?= base_url('parts/insert') ?>',
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Success response:', response);
+                    // Close the modal and reset form
+                    insertModal.hide();
+                    $('#insertPartForm')[0].reset();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: response.message,
+                        showConfirmButton: true,
+                        timer: 1500
+                    }).then(() => {
+                        // Refresh the search results if any search parameters are set
+                        if ($('#searchType').val() || $('#searchPartName').val() || $('#searchPartCaseNo').val()) {
+                            $('#searchButton').click();
+                        }
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error details:', {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        responseText: xhr.responseText,
+                        error: error
+                    });
+
+                    let errorMessage = 'Failed to insert part';
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.message) {
+                            errorMessage = response.message;
+                        }
+                    } catch (e) {
+                        errorMessage += ': ' + error;
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: errorMessage,
+                        confirmButtonColor: '#d33'
+                    });
+                }
+            });
+        });
+
+        // Handle Assign to Ticket button click
+        $(document).on('click', '.assignToTicket', function() {
+            const partId = $(this).data('part-id');
+            const partName = $(this).data('part-name');
+
+            // Load unfinished tickets
+            $.ajax({
+                url: '<?= base_url('ticket/unfinish/engineer') ?>?user=<?= session('name') ?>',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    $('#ticketsTable tbody').empty();
+
+                    if (!response || response.length === 0) {
+                        $('#ticketsTable tbody').append(`
                         <tr>
                             <td colspan="6" class="text-center">No unfinished tickets available</td>
                         </tr>
                     `);
-                } else {
-                    response.forEach(ticket => {
-                        $('#ticketsTable tbody').append(`
+                    } else {
+                        response.forEach(ticket => {
+                            $('#ticketsTable tbody').append(`
                             <tr>
                                 <td>${ticket.rma || ''}</td>
                                 <td>${ticket.customer_name || ''}</td>
@@ -320,116 +351,140 @@ $(document).ready(function() {
                                 </td>
                             </tr>
                         `);
+                        });
+                    }
+
+                    assignTicketModal.show();
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to load tickets: ' + error,
+                        confirmButtonColor: '#d33'
                     });
                 }
-                
-                assignTicketModal.show();
-            },
-            error: function(xhr, status, error) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: 'Failed to load tickets: ' + error,
-                    confirmButtonColor: '#d33'
-                });
-            }
-        });
-    });
-
-    // Handle ticket selection
-    $(document).on('click', '.selectTicket', function() {
-        const rma = $(this).data('rma');
-        const partId = $(this).data('part-id');
-        const partName = $(this).data('part-name');
-        
-        // Directly assign the part to the ticket
-        $.ajax({
-            url: '<?= base_url('parts/assign') ?>',
-            type: 'POST',
-            data: {
-                part_id: partId,
-                rma: rma,
-                part_name: partName,
-                user: user
-            },
-            dataType: 'json',
-            success: function(response) {
-                assignTicketModal.hide();
-                
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: response.message,
-                    showConfirmButton: true,
-                    timer: 1500
-                }).then(() => {
-                    // Refresh the search results
-                    $('#searchButton').click();
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error('AJAX Error:', {
-                    status: status,
-                    error: error,
-                    response: xhr.responseText
-                });
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: 'Failed to assign part: ' + error,
-                    confirmButtonColor: '#d33'
-                });
-            }
-        });
-    });
-
-    $('#searchButton').on('click', function() {
-        const type = $('#searchType').val();
-        const part_name = $('#searchPartName').val();
-        const part_case_no = $('#searchPartCaseNo').val();
-
-        if (!type && !part_name && !part_case_no) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Warning',
-                text: 'Please input at least 1 parameter',
-                confirmButtonColor: '#3085d6'
             });
-            return;
-        }
+        });
 
-        $.ajax({
-            url: '<?= base_url('parts/search') ?>',
-            type: 'POST',
-            data: {
-                type: type,
-                part_name: part_name,
-                part_case_no: part_case_no
-            },
-            success: function(response) {
-                try {
-                    const data = JSON.parse(response);
+        // Handle ticket selection
+        $(document).on('click', '.selectTicket', function() {
+            const rma = $(this).data('rma');
+            const partId = $(this).data('part-id');
+            const partName = $(this).data('part-name');
+
+            // Directly assign the part to the ticket
+            $.ajax({
+                url: '<?= base_url('parts/assign') ?>',
+                type: 'POST',
+                data: {
+                    part_id: partId,
+                    rma: rma,
+                    part_name: partName,
+                    user: user
+                },
+                dataType: 'json',
+                success: function(response) {
+                    assignTicketModal.hide();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: response.message,
+                        showConfirmButton: true,
+                        timer: 1500
+                    }).then(() => {
+                        // Refresh the search results
+                        $('#searchButton').click();
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', {
+                        status: status,
+                        error: error,
+                        response: xhr.responseText
+                    });
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to assign part: ' + error,
+                        confirmButtonColor: '#d33'
+                    });
+                }
+            });
+        });
+
+        $('#searchButton').on('click', function() {
+            const type = $('#searchType').val();
+            const part_name = $('#searchPartName').val();
+            const part_case_no = $('#searchPartCaseNo').val();
+
+            if (!type && !part_name && !part_case_no) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Please input at least 1 parameter',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
+            // Try to destroy existing DataTable if it exists
+            try {
+                const table = $('#searchPartsTable').DataTable();
+                if (table) {
+                    table.destroy();
+                }
+            } catch (e) {
+                console.log('No existing DataTable to destroy');
+            }
+
+            // Clear the table body
+            $('#searchPartsTable tbody').empty();
+            
+            // Show loading state
+            $('#searchPartsTable tbody').html('<tr><td colspan="10" class="text-center">Searching...</td></tr>');
+
+            $.ajax({
+                url: '<?= base_url('parts/search') ?>',
+                type: 'POST',
+                data: {
+                    type: type,
+                    part_name: part_name ? `%${part_name}%` : '',
+                    part_case_no: part_case_no ? `%${part_case_no}%` : ''
+                },
+                success: function(response) {
+                    console.log('Raw AJAX Response:', response);
+                    console.log('Request Parameters:', {
+                        type: type,
+                        part_name: part_name ? `%${part_name}%` : '',
+                        part_case_no: part_case_no ? `%${part_case_no}%` : ''
+                    });
                     
-                    $('#searchPartsTable tbody').empty();
-                    
-                    if (!data || data.length === 0) {
-                        $('#searchPartsTable tbody').append(`
+                    try {
+                        const data = JSON.parse(response);
+                        console.log('Parsed Data:', data);
+
+                        $('#searchPartsTable tbody').empty();
+
+                        if (!data || data.length === 0) {
+                            $('#searchPartsTable tbody').append(`
                             <tr>
                                 <td colspan="10" class="text-center">No parts found matching your search criteria</td>
                             </tr>
                         `);
-                    } else {
-                        data.forEach(function(part) {
-                            let actionButton = '';
-                            if (part.status === 'STOCK') {
-                                actionButton = `<button class="btn btn-sm btn-primary assignToTicket" 
+                        } else {
+                            data.forEach(function(part) {
+                                let actionButton = '';
+                                if (part.status === 'STOCK') {
+                                    actionButton = `<button class="btn btn-sm btn-primary assignToTicket" 
                                     data-part-id="${part.part_id}"
                                     data-part-name="${part.part_name}">Assign to Ticket</button>`;
-                            } else {
-                                actionButton = `<span class="badge bg-secondary">No actions available</span>`;
-                            }
+                                } else {
+                                    actionButton = `<span class="badge bg-secondary">No actions available</span>`;
+                                }
 
-                            $('#searchPartsTable tbody').append(`
+                                $('#searchPartsTable tbody').append(`
                                 <tr>
                                     <td>${part.part_id || ''}</td>
                                     <td>${part.brand || ''}</td>
@@ -439,38 +494,56 @@ $(document).ready(function() {
                                     <td>${part.part_sn || ''}</td>
                                     <td>${part.part_case_no || ''}</td>
                                     <td>${part.awb_no || ''}</td>
-                                    <td>${part.status || ''}</td>
+                                    <td><span class="badge bg-${part.status === 'STOCK' ? 'success' : 'secondary'}">${part.status || ''}</span></td>
+                                    <!-- Action button commented out for future use
                                     <td>${actionButton}</td>
+                                    -->
                                 </tr>
                             `);
+                            });
+                        }
+
+                        // Initialize DataTable
+                        $('#searchPartsTable').DataTable({
+                            destroy: true,
+                            responsive: true,
+                            pageLength: 10,
+                            order: [[0, 'desc']], // Sort by first column (Part ID) descending
+                            language: {
+                                search: "Filter results:",
+                                lengthMenu: "Show _MENU_ entries per page",
+                                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                                infoEmpty: "Showing 0 to 0 of 0 entries",
+                                infoFiltered: "(filtered from _MAX_ total entries)"
+                            }
+                        });
+
+                    } catch (e) {
+                        console.error('Error parsing JSON:', e);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'Failed to parse search results: ' + e.message,
+                            confirmButtonColor: '#d33'
                         });
                     }
-                } catch (e) {
-                    console.error('Error parsing JSON:', e);
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', {
+                        status: status,
+                        error: error,
+                        response: xhr.responseText
+                    });
                     Swal.fire({
                         icon: 'error',
                         title: 'Error!',
-                        text: 'Failed to parse search results: ' + e.message,
+                        text: 'Failed to search parts: ' + error,
                         confirmButtonColor: '#d33'
                     });
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error('AJAX Error:', {
-                    status: status,
-                    error: error,
-                    response: xhr.responseText
-                });
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: 'Failed to search parts: ' + error,
-                    confirmButtonColor: '#d33'
-                });
-            }
+            });
         });
     });
-});
 </script>
 
 <?= $this->endSection() ?>
