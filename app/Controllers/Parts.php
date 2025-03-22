@@ -135,6 +135,14 @@ class Parts extends BaseController
         return json_encode($data);
     }
 
+    public function getall()
+    {
+        $partmod = new PartsModel();
+        $data = $partmod->where('status', 'STOCK')->get()->getResult();
+
+        return json_encode($data);
+    }
+
     public function getlog()
     {
         $partmod = new PartslogModel();
