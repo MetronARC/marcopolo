@@ -145,14 +145,14 @@ class Parts extends BaseController
 
     public function search()
     {
-        // $partmod = new PartsModel();
-        // if ($this->request->getVar('brand')) { $partmod->where('brand');}
-        // if ($this->request->getVar('type')) { $partmod->where('type');}
-        // if ($this->request->getVar('name')) { $partmod->where('name');}
-        // $partmod->where('status', 'STOCK');
-        // $data = $partmod->get()->getResult();
+        $partmod = new PartsModel();
+        if ($this->request->getVar('type')) { $partmod->where('type', $this->request->getVar('type'));}
+        if ($this->request->getVar('part_name')) { $partmod->where('part_name', $this->request->getVar('part_name'));}
+        if ($this->request->getVar('part_case_no')) { $partmod->where('name', $this->request->getVar('part_case_no'));}
+        $partmod->where('status', 'STOCK');
+        $data = $partmod->get()->getResult();
 
-        // return json_encode($data);
+        return json_encode($data);
     }
 
     public function cancel()
