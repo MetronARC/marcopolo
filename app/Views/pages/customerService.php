@@ -574,6 +574,14 @@ helper('auth');
 
             const engineerSelect = document.getElementById('engineer');
             engineerSelect.innerHTML = '<option value="">Select Engineer</option>';
+
+            data.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.name;
+                option.textContent = user.name;
+                engineerSelect.appendChild(option);
+            });
+
             const engineersearchSelect = document.getElementById('search_engineer');
             engineersearchSelect.innerHTML = '<option value="">Select Engineer</option>';
 
@@ -581,7 +589,6 @@ helper('auth');
                 const option = document.createElement('option');
                 option.value = user.name;
                 option.textContent = user.name;
-                engineerSelect.appendChild(option);
                 engineersearchSelect.appendChild(option);
             });
         } catch (error) {
@@ -602,6 +609,19 @@ helper('auth');
 
             const deviceSelect = document.getElementById('device');
             deviceSelect.innerHTML = '<option value="">Select Device</option>';
+
+            data.forEach(device => {
+                const option = document.createElement('option');
+                option.value = device.device;
+                option.textContent = device.device;
+                deviceSelect.appendChild(option);
+            });
+
+            const otheroption = document.createElement('option');
+            otheroption.value = 'other';
+            otheroption.textContent = '+ Add New Device';
+            deviceSelect.appendChild(otheroption);
+
             const devicesearchSelect = document.getElementById('search_device');
             devicesearchSelect.innerHTML = '<option value="">Select Device</option>';
 
@@ -609,14 +629,8 @@ helper('auth');
                 const option = document.createElement('option');
                 option.value = device.device;
                 option.textContent = device.device;
-                deviceSelect.appendChild(option);
                 devicesearchSelect.appendChild(option);
             });
-
-            const otheroption = document.createElement('option');
-            otheroption.value = 'other';
-            otheroption.textContent = '+ Add New Device';
-            deviceSelect.appendChild(otheroption);
             
         } catch (error) {
             console.error('Error loading device:', error);
