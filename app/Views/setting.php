@@ -121,6 +121,7 @@
                             <option value="ADMIN">Admin</option>
                             <option value="ENGINEER">Engineer</option>
                             <option value="MANAGER">Manager</option>
+                            <option value="SUPERUSER">Super User <b>*for development only!*</b></option>
                         </select>
                         <label for="floatingSelect">Select Type</label>
                     </div>

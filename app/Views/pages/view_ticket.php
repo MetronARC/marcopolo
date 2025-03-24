@@ -8,7 +8,11 @@ helper('auth');
     <h1 class="h3 mb-0"><strong>Ticket</strong> Details</h1>
     <div>
         <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#updateTicketModal">Update Ticket</button>
-        <a href="/engineer" class="btn btn-secondary">Back to List</a>
+        <?php if(!in_array(session('type'), ['CS', 'ADMIN'])): ?>
+            <a href="/engineer" class="btn btn-secondary">Back to List</a>
+        <?php else : ?>
+            <a href="/parts" class="btn btn-secondary">Back to List</a>
+        <?php endif ?>
     </div>
 </div>
 
@@ -24,14 +28,29 @@ helper('auth');
                 <div class="mb-3">
                     <label for="ticketStatus" class="form-label">Select Status</label>
                     <select class="form-select" id="ticketStatus">
-                        <option value="WAIT FOR PART">WAIT FOR PART</option>
-                        <option value="WAIT FOR DATA">WAIT FOR DATA</option>
-                        <option value="WAIT FOR PASSWORD">WAIT FOR PASSWORD</option>
-                        <option value="WAIT FOR PRICE">WAIT FOR PRICE</option>
-                        <option value="WAIT FOR REPLACEMENT">WAIT FOR REPLACEMENT</option>
-                        <option value="WAIT FOR UNIT">WAIT FOR UNIT</option>
-                        <option value="WAIT FOR ESCALATION">WAIT FOR ESCALATION</option>
-                        <option value="WAIT FOR PICKUP">WAIT FOR PICKUP</option>
+                        <?php if(session('type') == 'ENGINEER' || session('type') == 'MANAGER') : ?>
+                            <option value="WAIT FOR PART">WAIT FOR PART</option>
+                            <option value="WAIT FOR DATA">WAIT FOR DATA</option>
+                            <option value="WAIT FOR PASSWORD">WAIT FOR PASSWORD</option>
+                            <option value="WAIT FOR PRICE">WAIT FOR PRICE</option>
+                            <option value="WAIT FOR REPLACEMENT">WAIT FOR REPLACEMENT</option>
+                            <option value="WAIT FOR UNIT">WAIT FOR UNIT</option>
+                            <option value="WAIT FOR ESCALATION">WAIT FOR ESCALATION</option>
+                            <option value="WAIT FOR PICKUP">WAIT FOR PICKUP</option>
+                        <?php elseif(session('type') == 'CS' || session('type') == 'ADMIN'): ?>
+                            <option value="CHECKING">CHECKING</option>
+                        <?php elseif(session('type') == 'SUPERUSER'): ?>
+                            <option value="CHECKING">CHECKING</option>
+                            <option value="WAIT FOR PART">WAIT FOR PART</option>
+                            <option value="WAIT FOR DATA">WAIT FOR DATA</option>
+                            <option value="WAIT FOR PASSWORD">WAIT FOR PASSWORD</option>
+                            <option value="WAIT FOR PRICE">WAIT FOR PRICE</option>
+                            <option value="WAIT FOR REPLACEMENT">WAIT FOR REPLACEMENT</option>
+                            <option value="WAIT FOR UNIT">WAIT FOR UNIT</option>
+                            <option value="WAIT FOR ESCALATION">WAIT FOR ESCALATION</option>
+                            <option value="WAIT FOR PICKUP">WAIT FOR PICKUP</option>
+                            <option value="FINISHED">FINISHED</option>
+                        <?php endif ?>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -444,12 +463,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Add event listeners for Use Part buttons
                 document.querySelectorAll('.use-part-btn').forEach(button => {
                     button.addEventListener('click', function() {
-                        const partId = this.getAttribute('data-part-id');
-                        const partName = this.getAttribute('data-part-name');
-                        document.getElementById('usePartId').value = partId;
-                        document.getElementById('usePartName').value = partName;
-                        const modal = new bootstrap.Modal(document.getElementById('usePartModal'));
-                        modal.show();
+                        const userType = '<?= session('type') ?>';
+                        console.log(userType)
+                        if(userType !== 'CS' && userType !== 'ADMIN'){
+                            const partId = this.getAttribute('data-part-id');
+                            const partName = this.getAttribute('data-part-name');
+                            document.getElementById('usePartId').value = partId;
+                            document.getElementById('usePartName').value = partName;
+                            const modal = new bootstrap.Modal(document.getElementById('usePartModal'));
+                            modal.show();
+                        } else {
+                            Swal.fire({
+                                title: "Oops!",
+                                text: "You're not allowed to do this function!",
+                                icon: "error"
+                            });
+                        }
                     });
                 });
 
