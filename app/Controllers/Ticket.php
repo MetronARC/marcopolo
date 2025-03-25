@@ -16,7 +16,7 @@ class Ticket extends BaseController
 
     public function create()
     {
-        if($this->request->getVar('customdevice')){
+        if ($this->request->getVar('customdevice')) {
             $device = $this->request->getVar('customdevice');
             $devicemod = new DeviceModel();
             $newdevice = [
@@ -112,11 +112,11 @@ class Ticket extends BaseController
 
     public function update_cs()
     {
-        if($this->request->getVar('ticket_status') == 'CHECKING'){
+        if ($this->request->getVar('ticket_status') == 'CHECKING') {
             $data = [
                 'ticket_status' => $this->request->getVar('ticket_status'),
             ];
-    
+
             $ticketmod = new TicketModel();
             $ticketmod->set($data)->where('rma', $this->request->getVar('rma'))->update();
 
@@ -126,7 +126,7 @@ class Ticket extends BaseController
                 'user' => $this->request->getVar('user'),
                 'created_at' => date('Y-m-d H:i:s')
             ];
-    
+
             $ticketlogmod = new TicketlogModel();
             $ticketlogmod->save($ticketlog);
 
@@ -140,7 +140,7 @@ class Ticket extends BaseController
                 'description'    => json_encode($ticketlog),
             ];
             $logmod->insert($log);
-    
+
             return $this->respond(['message' => 'Update ticket successfully!'], 200);
         } else {
             $data = [
@@ -151,7 +151,7 @@ class Ticket extends BaseController
                 'payment_at' => date('Y-m-d H:i:s'),
                 'payment_note' => $this->request->getVar('payment_note'),
             ];
-    
+
             $ticketmod = new TicketModel();
             $ticketmod->set($data)->where('rma', $this->request->getVar('rma'))->update();
 
@@ -161,7 +161,7 @@ class Ticket extends BaseController
                 'user' => $this->request->getVar('user'),
                 'created_at' => date('Y-m-d H:i:s')
             ];
-    
+
             $ticketlogmod = new TicketlogModel();
             $ticketlogmod->save($ticketlog);
 
@@ -175,7 +175,7 @@ class Ticket extends BaseController
                 'description'    => json_encode($ticketlog),
             ];
             $logmod->insert($log);
-    
+
             return $this->respond(['message' => 'Update ticket successfully!'], 200);
         }
     }
@@ -206,7 +206,7 @@ class Ticket extends BaseController
     public function unfinish_engineer()
     {
         $status = [
-            'CHECKING', 
+            'CHECKING',
             'WAIT FOR PART',
             'WAIT FOR DATA',
             'WAIT FOR PASSWORD',
@@ -227,7 +227,7 @@ class Ticket extends BaseController
     public function unfinish_cs()
     {
         $status = [
-            'CHECKING', 
+            'CHECKING',
             'WAIT FOR PICKUP',
         ];
         $ticketmod = new TicketModel();
@@ -256,20 +256,35 @@ class Ticket extends BaseController
     public function stat()
     {
         $ticketmod      = new TicketModel();
-        $checking       = $ticketmod->orderBy('created_at', 'DESC')->where('ticket_status', 'CHECKING')->get()->getResult();
-        $waitpart       = $ticketmod->orderBy('created_at', 'DESC')->where('ticket_status', 'WAIT FOR PART')->get()->getResult();
-        $waitpickup     = $ticketmod->orderBy('created_at', 'DESC')->where('ticket_status', 'WAIT FOR PICKUP')->get()->getResult();
-        $escalation     = $ticketmod->orderBy('created_at', 'DESC')->where('ticket_status', 'WAIT FOR ESCALATION')->get()->getResult();
+        $ticketlogmod   = new TicketlogModel();
+        $unfinish       = $ticketmod->orderBy('created_at', 'DESC')->where('ticket_status !=', 'FINISHED')->get()->getResult();
+        $ticketCounts   = [];
 
-        $stat = [
-            'new'           => count($checking),
-            'checking'      => count($checking),
-            'waitpart'      => count($waitpart),
-            'waitpickup'    => count($waitpickup),
-            'escalation'    => count($escalation),
-        ];
-
-        return json_encode($stat);
+        foreach ($unfinish as $ticket) {
+            $status = strtolower($ticket->ticket_status);
+            if($status == 'checking'){
+                $logs = $ticketlogmod->where('rma', $ticket->rma)->get()->getResult();
+                if (count($logs) == 1) {
+                    if (!isset($ticketCounts['New Ticket'])) {
+                        $ticketCounts['New Ticket'] = 0;
+                    } else {
+                        $ticketCounts['New Ticket']++;
+                    }
+                } else {
+                    if (!isset($ticketCounts['Repair'])) {
+                        $ticketCounts['Repair'] = 0;
+                    } else {
+                        $ticketCounts['Repair']++;
+                    }
+                }
+            } else {
+                if (!isset($ticketCounts[ucwords($status)])) {
+                    $ticketCounts[ucwords($status)] = 0;
+                }
+                $ticketCounts[ucwords($status)]++;
+            }
+        }
+        return json_encode($ticketCounts);
     }
 
     public function stat_device()
@@ -315,27 +330,27 @@ class Ticket extends BaseController
     {
         $ticketmod = new TicketModel();
         $lastdata = $ticketmod->orderBy('created_at', 'DESC')->limit(1)->get()->getRow();
-        if($lastdata){
+        if ($lastdata) {
             $lastid = $lastdata->rma;
             //T + [2 digit year] + [2 digit month] + [3 digit sequence]
             $lastyear = substr($lastid, 1, 2);
             $lastmonth = substr($lastid, 3, 2);
             $lastseq = (int)substr($lastid, 5, 3);
-            if(date('y') == $lastyear){
-                if(date('m') == $lastmonth){
+            if (date('y') == $lastyear) {
+                if (date('m') == $lastmonth) {
                     $newseq = $lastseq + 1;
-                    $newid = 'T' . $lastyear . $lastmonth . sprintf("%03d", $newseq); 
+                    $newid = 'T' . $lastyear . $lastmonth . sprintf("%03d", $newseq);
                     return $newid;
                 } else {
-                    $newid = 'T' . $lastyear . date('m') . sprintf("%03d", 1); 
+                    $newid = 'T' . $lastyear . date('m') . sprintf("%03d", 1);
                     return $newid;
                 }
             } else {
-                $newid = 'T' . date('y') . date('m') . sprintf("%03d", 1); 
+                $newid = 'T' . date('y') . date('m') . sprintf("%03d", 1);
                 return $newid;
             }
         } else {
-            $newid = 'T' . date('y') . date('m') . sprintf("%03d", 1); 
+            $newid = 'T' . date('y') . date('m') . sprintf("%03d", 1);
             return $newid;
         }
     }
@@ -360,12 +375,24 @@ class Ticket extends BaseController
     public function search()
     {
         $ticketmod      = new TicketModel();
-        if($this->request->getVar('search_rma')) { $ticketmod->where('rma', $this->request->getVar('search_rma')); }
-        if($this->request->getVar('search_engineer')) { $ticketmod->where('engineer', $this->request->getVar('search_engineer')); }
-        if($this->request->getVar('search_status')) { $ticketmod->where('ticket_status', $this->request->getVar('search_status')); }
-        if($this->request->getVar('search_device')) { $ticketmod->where('device', $this->request->getVar('search_device')); }
-        if($this->request->getVar('search_startdate')) { $ticketmod->where('created_at >=', $this->request->getVar('search_startdate')); }
-        if($this->request->getVar('search_enddate')) { $ticketmod->where('created_at <=', $this->request->getVar('search_enddate')); }
+        if ($this->request->getVar('search_rma')) {
+            $ticketmod->where('rma', $this->request->getVar('search_rma'));
+        }
+        if ($this->request->getVar('search_engineer')) {
+            $ticketmod->where('engineer', $this->request->getVar('search_engineer'));
+        }
+        if ($this->request->getVar('search_status')) {
+            $ticketmod->where('ticket_status', $this->request->getVar('search_status'));
+        }
+        if ($this->request->getVar('search_device')) {
+            $ticketmod->where('device', $this->request->getVar('search_device'));
+        }
+        if ($this->request->getVar('search_startdate')) {
+            $ticketmod->where('created_at >=', $this->request->getVar('search_startdate'));
+        }
+        if ($this->request->getVar('search_enddate')) {
+            $ticketmod->where('created_at <=', $this->request->getVar('search_enddate'));
+        }
 
         $data = $ticketmod->orderBy('created_at', 'DESC')->get()->getResult();
         return json_encode($data);

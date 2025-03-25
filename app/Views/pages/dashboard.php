@@ -6,132 +6,8 @@
     <h1 class="h3 mb-3"><strong>AppDesk</strong> Dashboard</h1>
 
     <div class="w-100">
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col mt-0">
-                                <h5 class="card-title">New Ticket</h5>
-                            </div>
-
-                            <div class="col-auto">
-                                <div class="stat text-primary">
-                                    <i class="align-middle" data-feather="file-plus"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <h1 class="mt-1 mb-3" id="new-ticket-count">
-                            <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </h1>
-                        <div class="mb-0">
-                            <span class="text-muted">Unit</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col mt-0">
-                                <h5 class="card-title">In Progress</h5>
-                            </div>
-
-                            <div class="col-auto">
-                                <div class="stat text-primary">
-                                    <i class="align-middle" data-feather="activity"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <h1 class="mt-1 mb-3" id="in-progress-count">
-                            <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </h1>
-                        <div class="mb-0">
-                            <span class="text-muted">Unit</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col mt-0">
-                                <h5 class="card-title">Wait For Part</h5>
-                            </div>
-
-                            <div class="col-auto">
-                                <div class="stat text-primary">
-                                    <i class="align-middle" data-feather="cpu"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <h1 class="mt-1 mb-3" id="wait-part-count">
-                            <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </h1>
-                        <div class="mb-0">
-                            <span class="text-muted">Unit</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col mt-0">
-                                <h5 class="card-title">Wait For Escalation</h5>
-                            </div>
-
-                            <div class="col-auto">
-                                <div class="stat text-primary">
-                                    <i class="align-middle" data-feather="send"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <h1 class="mt-1 mb-3" id="escalation-count">
-                            <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </h1>
-                        <div class="mb-0">
-                            <span class="text-muted">Unit</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col mt-0">
-                                <h5 class="card-title">Ready To Pickup</h5>
-                            </div>
-
-                            <div class="col-auto">
-                                <div class="stat text-primary">
-                                    <i class="align-middle" data-feather="truck"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <h1 class="mt-1 mb-3" id="ready-pickup-count">
-                            <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                        </h1>
-                        <div class="mb-0">
-                            <span class="text-muted">Unit</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="row ticketStat">
+            
         </div>
     </div>
 
@@ -218,7 +94,7 @@
         if (!dateString) return '-';
         const date = new Date(dateString);
         if (isNaN(date.getTime())) return dateString;
-        
+
         return date.toLocaleDateString('en-GB', {
             day: '2-digit',
             month: '2-digit',
@@ -244,19 +120,43 @@
             .then(response => response.json())
             .then(data => {
                 console.log('Ticket Statistics:', data);
-                document.getElementById('new-ticket-count').textContent = data.new;
-                document.getElementById('in-progress-count').textContent = data.checking;
-                document.getElementById('wait-part-count').textContent = data.waitpart;
-                document.getElementById('escalation-count').textContent = data.escalation;
-                document.getElementById('ready-pickup-count').textContent = data.waitpickup;
+                $('.ticketStat').empty()
+                for (const key in data) {
+                    console.log(`${key}: ${data[key]}`);
+                    $('.ticketStat').append(`
+                        <div class="col-3 d-flex">
+                            <div class="card flex-fill">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col mt-0">
+                                            <h5 class="card-title">${key}</h5>
+                                        </div>
+
+                                        <div class="col-auto">
+                                            <h1 class="mb-1" id="new-ticket-count">${data[key]}</h1>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `)
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
-                document.getElementById('new-ticket-count').textContent = 'Error';
-                document.getElementById('in-progress-count').textContent = 'Error';
-                document.getElementById('wait-part-count').textContent = 'Error';
-                document.getElementById('escalation-count').textContent = 'Error';
-                document.getElementById('ready-pickup-count').textContent = 'Error';
+                $('.ticketStat').empty().append(`
+                    <div class="col-12 d-flex">
+                        <div class="card flex-fill">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col mt-0">
+                                        <h5 class="card-title">Data Empty</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `)
             });
     }
 
@@ -274,35 +174,40 @@
                     ticketTable = $('#ticketTable').DataTable({
                         responsive: true,
                         data: data,
-                        columns: [
-                            { data: 'rma' },
-                            { data: 'customer_name' },
-                            { 
+                        columns: [{
+                                data: 'rma'
+                            },
+                            {
+                                data: 'customer_name'
+                            },
+                            {
                                 data: 'created_at',
                                 render: function(data) {
                                     return formatDate(data);
                                 }
                             },
-                            { 
+                            {
                                 data: 'close_date',
                                 render: function(data) {
                                     return formatDate(data);
                                 }
                             },
-                            { 
+                            {
                                 data: 'ticket_status',
                                 render: function(data) {
                                     return `<span class="badge bg-${getStatusColor(data)}">${data}</span>`;
                                 }
                             },
-                            { 
+                            {
                                 data: 'engineer',
                                 render: function(data) {
                                     return data || '-';
                                 }
                             }
                         ],
-                        order: [[2, 'desc']], // Sort by created date by default
+                        order: [
+                            [2, 'desc']
+                        ], // Sort by created date by default
                         pageLength: 10,
                         language: {
                             emptyTable: "No tickets found"
