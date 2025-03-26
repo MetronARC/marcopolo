@@ -6,7 +6,7 @@ helper('auth');
 <?= $this->section('page-content') ?>
 
 <div class="container-fluid p-0">
-    <h1 class="h3 mb-3">All Ticket</h1>
+    <h1 class="h3 mb-3">All Tickets</h1>
 
     <div class="card">
         <div class="card-body">

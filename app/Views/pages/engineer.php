@@ -26,7 +26,7 @@ helper('auth');
                     </div>
                     <h1 class="mt-1 mb-3" id="new-ticket-count">
                         <div class="spinner-border spinner-border-sm text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                            <span class="visually-hidden">Loading....</span>
                         </div>
                     </h1>
                     <div class="mb-0">
