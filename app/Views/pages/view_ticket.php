@@ -5,7 +5,7 @@ helper('auth');
 <?= $this->extend('template/index') ?>
 <?= $this->section('page-content') ?>
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0"><strong>Ticket</strong> Details</h1>
+    <h1 class="h3 mb-0"><strong>Ticket</strong> Detail</h1>
     <div>
         <button type="button" class="btn btn-primary me-2" id="updatebtn" data-bs-toggle="modal" data-bs-target="#updateTicketModal">Update Ticket</button>
         <?php if(!in_array(session('type'), ['CS', 'ADMIN'])): ?>
