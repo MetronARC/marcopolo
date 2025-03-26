@@ -110,6 +110,11 @@ class Login extends BaseController
                 'icon'  => 'zap',
                 'path'  => 'engineer'
             ],
+            'allTicket' => [
+                'name'  => 'All Ticket',
+                'icon'  => 'book',
+                'path'  => 'allTicket'
+            ],
             'part' => [
                 'name'  => 'Parts',
                 'icon'  => 'cpu',
@@ -135,8 +140,8 @@ class Login extends BaseController
         $access = [
             'ENGINEER'  => ['dashboard', 'engineer', 'logout'],
             'CS'        => ['dashboard', 'cs', 'part', 'logout'],
-            'ADMIN'     => ['dashboard', 'cs', 'part', 'logout'],
-            'MANAGER'   => ['dashboard', 'cs', 'part', 'performance', 'setting', 'logout'],
+            'ADMIN'     => ['dashboard', 'cs', 'part', 'allTicket', 'logout'],
+            'MANAGER'   => ['dashboard', 'cs', 'part', 'allTicket', 'performance', 'setting', 'logout'],
             'SUPERUSER' => ['dashboard', 'cs', 'engineer', 'part', 'performance', 'setting', 'logout'],
         ];
 

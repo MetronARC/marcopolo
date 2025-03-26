@@ -130,7 +130,7 @@ helper('auth');
                     </div>
                     <div class="mb-3">
                         <label for="part_number" class="form-label">Part Number</label>
-                        <input type="text" class="form-control" id="part_number" name="part_number" required>
+                        <input type="text" class="form-control" id="part_number" name="part_number">
                     </div>
                     <div class="mb-3">
                         <label for="part_name" class="form-label">Part Name</label>
@@ -138,17 +138,17 @@ helper('auth');
                     </div>
                     <div class="mb-3">
                         <label for="part_sn" class="form-label">Part SN</label>
-                        <input type="text" class="form-control" id="part_sn" name="part_sn" required>
+                        <input type="text" class="form-control" id="part_sn" name="part_sn">
                     </div>
                     <div class="mb-3">
                         <label for="part_case_no" class="form-label">Part Case Number</label>
-                        <select class="form-select" id="part_case_no" name="part_case_no" required>
+                        <select class="form-select" id="part_case_no" name="part_case_no">
                             <option value="">Select case number...</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label for="awb_no" class="form-label">AWB Number</label>
-                        <input type="text" class="form-control" id="awb_no" name="awb_no" required>
+                        <input type="text" class="form-control" id="awb_no" name="awb_no">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -308,9 +308,7 @@ helper('auth');
                         showConfirmButton: true,
                         timer: 1500
                     }).then(() => {
-                        if ($('#searchType').val() || $('#searchPartName').val() || $('#searchPartCaseNo').val()) {
-                            $('#searchButton').click();
-                        }
+                        window.location.reload();
                     });
                 },
                 error: function(xhr, status, error) {
@@ -452,15 +450,17 @@ helper('auth');
                 return;
             }
 
-            // Initialize table if it doesn't exist, destroy if it does
-            let searchTable = $('#searchPartsTable').DataTable();
+            // First destroy existing DataTable if it exists
             if ($.fn.DataTable.isDataTable('#searchPartsTable')) {
-                searchTable.clear().destroy();
-                $('#searchPartsTable tbody').empty();
+                $('#searchPartsTable').DataTable().destroy();
             }
 
-            // Show loading message
-            $('#searchPartsTable tbody').html('<tr><td colspan="9" class="text-center">Searching...</td></tr>');
+            // Clear the table body
+            $('#searchPartsTable tbody').empty();
+
+            // Show loading message with correct column structure
+            const emptyRow = `<tr>${'<td></td>'.repeat(8)}<td></td></tr>`;
+            $('#searchPartsTable tbody').html(emptyRow);
 
             $.ajax({
                 url: '<?= base_url('parts/search') ?>',
@@ -481,11 +481,18 @@ helper('auth');
                         $('#searchPartsTable tbody').empty();
 
                         if (!data || data.length === 0) {
-                            $('#searchPartsTable tbody').html(`
-                                <tr>
-                                    <td colspan="9" class="text-center">No parts found matching your search criteria</td>
-                                </tr>
-                            `);
+                            // Show Swal alert for no results and refresh page on OK
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'No Results',
+                                text: 'No parts found matching your search criteria',
+                                confirmButtonColor: '#3085d6'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.reload();
+                                }
+                            });
+                            return; // Stop further execution
                         } else {
                             let tableHtml = '';
                             data.forEach(function(part) {
@@ -506,12 +513,10 @@ helper('auth');
                             $('#searchPartsTable tbody').html(tableHtml);
                         }
 
-                        // Initialize DataTable with new data
-                        if ($.fn.DataTable.isDataTable('#searchPartsTable')) {
-                            $('#searchPartsTable').DataTable().destroy();
-                        }
-                        
-                        $('#searchPartsTable').DataTable({
+                        // Initialize DataTable
+                        const dataTableConfig = {
+                            destroy: true,
+                            retrieve: false,
                             responsive: true,
                             pageLength: 10,
                             order: [[0, 'desc']],
@@ -522,10 +527,42 @@ helper('auth');
                                 infoEmpty: "Showing 0 to 0 of 0 entries",
                                 infoFiltered: "(filtered from _MAX_ total entries)"
                             }
-                        });
+                        };
+
+                        if (!data || data.length === 0) {
+                            dataTableConfig.ordering = false;
+                            dataTableConfig.searching = false;
+                        }
+
+                        $('#searchPartsTable').DataTable(dataTableConfig);
 
                     } catch (e) {
                         console.error('Error parsing JSON:', e);
+                        const errorRow = `
+                            <tr>
+                                <td class="text-center text-danger">Error: ${e.message}</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        `;
+                        $('#searchPartsTable tbody').html(errorRow);
+
+                        // Initialize DataTable with minimal configuration
+                        $('#searchPartsTable').DataTable({
+                            destroy: true,
+                            retrieve: false,
+                            responsive: true,
+                            ordering: false,
+                            searching: false,
+                            paging: false
+                        });
+                        
                         Swal.fire({
                             icon: 'error',
                             title: 'Error!',
@@ -540,11 +577,31 @@ helper('auth');
                         error: error,
                         response: xhr.responseText
                     });
-                    $('#searchPartsTable tbody').html(`
+                    const errorRow = `
                         <tr>
-                            <td colspan="9" class="text-center text-danger">Failed to search parts: ${error}</td>
+                            <td class="text-center text-danger">Error: ${error}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
                         </tr>
-                    `);
+                    `;
+                    $('#searchPartsTable tbody').html(errorRow);
+
+                    // Initialize DataTable with minimal configuration
+                    $('#searchPartsTable').DataTable({
+                        destroy: true,
+                        retrieve: false,
+                        responsive: true,
+                        ordering: false,
+                        searching: false,
+                        paging: false
+                    });
+
                     Swal.fire({
                         icon: 'error',
                         title: 'Error!',

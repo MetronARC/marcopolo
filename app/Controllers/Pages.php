@@ -55,4 +55,9 @@ class Pages extends BaseController
         }
         return redirect()->to('/engineer');
     }
+
+    public function allTicket()
+    {
+        return view('pages/allTicket');
+    }
 } 

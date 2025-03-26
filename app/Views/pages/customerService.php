@@ -20,7 +20,7 @@ helper('auth');
                 <button class="btn btn-info float-end me-2" data-bs-toggle="modal" data-bs-target="#searchTicketModal"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
             <table class="table table-hover my-0">
-                <thead>
+                <thead> 
                     <tr>
                         <th>RMA</th>
                         <th>Customer Name</th>
@@ -68,11 +68,11 @@ helper('auth');
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="customer_email" class="form-label">Customer Email</label>
-                            <input type="email" class="form-control" id="customer_email" name="customer_email" required>
+                            <input type="email" class="form-control" id="customer_email" name="customer_email">
                         </div>
                         <div class="col-md-6">
                             <label for="customer_address" class="form-label">Customer Address</label>
-                            <input type="text" class="form-control" id="customer_address" name="customer_address" required>
+                            <input type="text" class="form-control" id="customer_address" name="customer_address">
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -97,7 +97,7 @@ helper('auth');
                     <div class="row mb-3">
                         <div class="col-md-4">
                             <label for="service_no" class="form-label">Service Number</label>
-                            <input type="text" class="form-control" id="service_no" name="service_no" required>
+                            <input type="text" class="form-control" id="service_no" name="service_no">
                         </div>
                         <div class="col-md-4">
                             <label for="sn" class="form-label">Serial Number</label>
@@ -114,11 +114,11 @@ helper('auth');
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="warranty_date" class="form-label">Warranty Date</label>
-                            <input type="text" class="form-control" id="warranty_date" name="warranty_date" placeholder="Enter warranty date">
+                            <input type="text" class="form-control" id="warranty_date" name="warranty_date" required placeholder="Enter warranty date">
                         </div>
                         <div class="col-md-6">
                             <label for="device_condition" class="form-label">Device Status</label>
-                            <select class="form-select" id="device_condition" name="device_condition" required>
+                            <select class="form-select" id="device_condition" name="device_condition">
                                 <option value="Unit Customer">Unit Customer</option>
                                 <option value="Stock Toko">Stock Toko</option>
                             </select>
@@ -130,7 +130,7 @@ helper('auth');
                     </div>
                     <div class="mb-3">
                         <label for="detail_problem" class="form-label">Detail Problem</label>
-                        <textarea class="form-control" id="detail_problem" name="detail_problem" rows="3" required></textarea>
+                        <textarea class="form-control" id="detail_problem" name="detail_problem" rows="3"></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="accessories" class="form-label">Accessories</label>
@@ -440,6 +440,18 @@ helper('auth');
             const data = await response.json();
 
             if (data.message) {
+                const modalElement = document.getElementById('registerTicketModal');
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                modal.hide();
+                document.body.classList.remove('modal-open');
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                    backdrop.remove();
+                }
+                
+                this.reset();
+                await loadTickets();
+                
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',
@@ -447,10 +459,6 @@ helper('auth');
                     showConfirmButton: false,
                     timer: 1500
                 });
-                const modal = bootstrap.Modal.getInstance(document.getElementById('registerTicketModal'));
-                modal.hide();
-                this.reset();
-                await loadTickets();
             } else {
                 throw new Error('No response message received');
             }
