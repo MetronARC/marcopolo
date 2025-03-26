@@ -25,7 +25,7 @@ class Ticket extends Migration
             'type' => ['type' => 'VARCHAR', 'constraint' => 100],
             'sn' => ['type' => 'VARCHAR', 'constraint' => 100],
             'warranty' => ['type' => 'BOOLEAN'],
-            'warranty_date' => ['type' => 'DATE', 'null' => true],
+            'warranty_date' => ['type' => 'VARCHAR', 'constraint' => 100],
             'device_condition' => ['type' => 'TEXT'],
             'problem' => ['type' => 'TEXT'],
             'detail_problem' => ['type' => 'TEXT'],
