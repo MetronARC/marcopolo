@@ -7,7 +7,7 @@ helper('auth');
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h3 mb-0"><strong>Ticket</strong> Details</h1>
     <div>
-        <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#updateTicketModal">Update Ticket</button>
+        <button type="button" class="btn btn-primary me-2" id="updatebtn" data-bs-toggle="modal" data-bs-target="#updateTicketModal">Update Ticket</button>
         <?php if(!in_array(session('type'), ['CS', 'ADMIN'])): ?>
             <a href="/engineer" class="btn btn-secondary">Back to List</a>
         <?php else : ?>
@@ -261,6 +261,10 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             console.log('Ticket Details:');
             console.log(JSON.stringify(data, null, 2));
+
+            if(data.ticket_status == 'FINISHED'){
+                $('#updatebtn').prop('disabled', true);
+            }
             
             document.getElementById('ticket-details').innerHTML = `
                 <div class="row g-3">
