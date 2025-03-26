@@ -142,7 +142,7 @@ class Login extends BaseController
             'CS'        => ['dashboard', 'cs', 'part', 'logout'],
             'ADMIN'     => ['dashboard', 'cs', 'part', 'allTicket', 'logout'],
             'MANAGER'   => ['dashboard', 'cs', 'part', 'allTicket', 'performance', 'setting', 'logout'],
-            'SUPERUSER' => ['dashboard', 'cs', 'engineer', 'part', 'performance', 'setting', 'logout'],
+            'SUPERUSER' => ['dashboard', 'cs', 'engineer', 'allTicket', 'part', 'performance', 'setting', 'logout'],
         ];
 
         if (array_key_exists(strtoupper($type), $access)) {

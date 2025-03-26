@@ -5,7 +5,7 @@ helper('auth');
 <?= $this->extend('template/index') ?>
 <?= $this->section('page-content') ?>
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0"><strong>Customer Service</strong>Dashboard</h1>
+    <h1 class="h3 mb-0"><strong>Customer Service</strong> Dashboard</h1>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerTicketModal">
         <i class="align-middle" data-feather="plus"></i> Register Ticket
     </button>
