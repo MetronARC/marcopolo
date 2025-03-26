@@ -134,7 +134,11 @@ helper('auth');
                     </div>
                     <div class="mb-3">
                         <label for="accessories" class="form-label">Accessories</label>
-                        <textarea class="form-control" id="accessories" name="accessories" rows="2"></textarea>
+                        <select class="form-select" id="accessories" name="accessories" required>
+                            <option value="">Select Accessories</option>
+                            <option value="Adapter">Adapter</option>
+                            <option value="Adapter Type C">Adapter Type C</option>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="engineer" class="form-label">Engineer</label>
