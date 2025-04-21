@@ -17,6 +17,75 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	
+	<style>
+		:root {
+			--login-container-opacity: 0.7; /* You can adjust this value between 0 and 1 */
+		}
+
+		body {
+			background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.3)), url('assets/img/ship-background.png');
+			background-size: cover;
+			background-position: center;
+			background-attachment: fixed;
+			min-height: 100vh;
+		}
+		
+		.login-container {
+			background: rgba(255, 255, 255, calc(var(--login-container-opacity)));
+			border-radius: 15px;
+			box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+			padding: 2rem;
+			backdrop-filter: blur(10px);
+			transition: background 0.3s ease;
+		}
+
+		.login-container:hover {
+			background: rgba(255, 255, 255, calc(var(--login-container-opacity) + 0.05));
+		}
+
+		.logo-container {
+			margin-bottom: 2rem;
+		}
+
+		.logo-container img {
+			width: 120px;
+			height: auto;
+			margin-bottom: 1rem;
+		}
+
+		.form-control {
+			background: rgba(255, 255, 255, 0.9);
+			border-radius: 8px;
+			padding: 0.75rem 1rem;
+			border: 1px solid rgba(222, 226, 230, 0.8);
+			transition: all 0.3s;
+		}
+
+		.form-control:focus {
+			background: rgba(255, 255, 255, 1);
+			box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+		}
+
+		.btn-primary {
+			border-radius: 8px;
+			padding: 0.75rem 1.5rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			transition: all 0.3s;
+		}
+
+		.btn-primary:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+		}
+
+		.welcome-text {
+			color: white;
+			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+		}
+	</style>
 </head>
 
 <body>
@@ -32,39 +101,30 @@
 		</script>
 	<?php endif; ?>
 
-	<main class="d-flex w-100">
-		<div class="container d-flex flex-column">
-			<div class="row vh-100">
-				<div class="col-sm-10 col-md-8 col-lg-6 col-xl-5 mx-auto d-table h-100">
-					<div class="d-table-cell align-middle">
-
-						<div class="text-center mt-4">
-							<img class="img-fluid" src="<?= base_url('assets/img/logo.png') ?>" style="width: 150px; height:auto;">
-							<h1 class="h2">Marcopolo Marine</h1>
-							<p class="lead">
-								Sign in to your account to continue
-							</p>
+	<main class="d-flex w-100 align-items-center min-vh-100">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-12 col-md-8 col-lg-6 col-xl-5">
+					
+					<div class="login-container">
+						<div class="logo-container text-center">
+							<img src="<?= base_url('assets/img/logo.png') ?>" alt="Marcopolo Marine Logo" class="img-fluid">
+							<h3 class="h4 text-secondary">Sign in to your account</h3>
 						</div>
 
-						<div class="card">
-							<div class="card-body">
-								<div class="m-sm-3">
-									<form id="loginForm" action="actionlogin" method="post">
-										<div class="mb-3">
-											<label class="form-label">Email</label>
-											<input class="form-control form-control-lg" type="email" name="email" id="email" placeholder="Enter your email" />
-										</div>
-										<div class="mb-5">
-											<label class="form-label">Password</label>
-											<input class="form-control form-control-lg" type="password" name="password" id="password" placeholder="Enter your password" />
-										</div>
-										<div class="d-grid gap-2 mt-3">
-											<button type="submit" class="btn btn-lg btn-primary">Sign in</button>
-										</div>
-									</form>
-								</div>
+						<form id="loginForm" action="actionlogin" method="post">
+							<div class="mb-4">
+								<label class="form-label">Email</label>
+								<input class="form-control form-control-lg" type="email" name="email" id="email" placeholder="Enter your email" required />
 							</div>
-						</div>
+							<div class="mb-4">
+								<label class="form-label">Password</label>
+								<input class="form-control form-control-lg" type="password" name="password" id="password" placeholder="Enter your password" required />
+							</div>
+							<div class="d-grid">
+								<button type="submit" class="btn btn-primary btn-lg">Sign in</button>
+							</div>
+						</form>
 					</div>
 				</div>
 			</div>
