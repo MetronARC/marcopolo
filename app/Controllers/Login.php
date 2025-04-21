@@ -4,8 +4,6 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\UserModel;
-use App\Models\UserlogModel;
 
 class Login extends BaseController
 {
@@ -21,73 +19,25 @@ class Login extends BaseController
             'password'  => $this->request->getVar('password'),
         ];
 
-        $usermod = new UserModel();
-        $logindata   = $usermod->where('email', $data['email'])->get()->getRow();
-
-        $request = service('request');
-        $clientIP = $request->getIPAddress();
-
-        if ($logindata) {
-            if (!password_verify($data['password'], $logindata->password)) {
-                session()->setFlashdata('error', 'Incorrect username or password, please try again ! ');
-                return redirect()->to('login');
-            } else {
-                session()->set('userid', $logindata->user_id);
-                session()->set('name', $logindata->name);
-                session()->set('email', $logindata->email);
-                session()->set('type', $logindata->type);
-                session()->set('access', $this->access($logindata->type));
-                session()->set('ip', $clientIP);
-                if($data['email'] == $data['password']){
-                    session()->set('firstlogin', true);
-                } else {
-                    session()->set('firstlogin', false);
-                }
-
-                if (substr_count($clientIP, '.') === 3) {
-                    $locationData = file_get_contents("https://freeipapi.com/api/json/".$clientIP);
-                    $locationData = json_decode($locationData, true);
-                } else {
-                    $locationData = [];
-                }
-
-                session()->set('logindata', json_encode($locationData));
-
-                $logmod = new UserlogModel();
-                $log = [
-                    'userid'        => $logindata->user_id,
-                    'email'         => $logindata->email,
-                    'name'          => $logindata->name,
-                    'action'        => 'LOGIN',
-                    'created_at'    => date('Y-m-d H:i:s'),
-                    'description'   => json_encode($locationData),
-                ];
-                $logmod->insert($log);
-
-                $usermod->set('lastlogin_at', date('Y-m-d H:i:s'))->where('user_id', $logindata->user_id)->update();
-
-                return redirect()->to('/');
-            }
+        // Hardcoded credentials check
+        if ($data['email'] === 'admin@test' && $data['password'] === 'admin') {
+            session()->set('userid', '1');
+            session()->set('name', 'Test User');
+            session()->set('email', $data['email']);
+            session()->set('type', 'ADMIN');
+            session()->set('access', $this->access('ADMIN'));
+            session()->set('ip', $this->request->getIPAddress());
+            session()->set('firstlogin', false);
+            
+            return redirect()->to('/');
         } else {
-            session()->setFlashdata('error', 'Incorrect username or password, please try again !');
+            session()->setFlashdata('error', 'Incorrect username or password, please try again!');
             return redirect()->to('login');
         }
     }
 
-
     public function logout()
     {
-        $logmod = new UserlogModel();
-        $log = [
-            'userid'         => session('userid'),
-            'email'          => session('email'),
-            'name'           => session('name'),
-            'action'         => '/logout',
-            'created_at'     => date('Y-m-d H:i:s'),
-            'description'    => session('logindata'),
-        ];
-        $logmod->insert($log);
-
         session()->destroy();
         return redirect()->to('login');
     }
@@ -100,35 +50,20 @@ class Login extends BaseController
                 'icon'  => 'layout',
                 'path'  => '/'
             ],
-            'cs' => [
-                'name'  => 'Customer Service',
-                'icon'  => 'sliders',
-                'path'  => 'cs'
+            'customer-database' => [
+                'name'  => 'Customer Database',
+                'icon'  => 'book-open',
+                'path'  => 'customer-database'
             ],
-            'engineer' => [
-                'name'  => 'Engineer',
-                'icon'  => 'zap',
-                'path'  => 'engineer'
+            'ship-inquiry' => [
+                'name'  => 'Ship Inquiry',
+                'icon'  => 'anchor',
+                'path'  => 'ship-inquiry'
             ],
-            'allTicket' => [
-                'name'  => 'All Ticket',
-                'icon'  => 'book',
-                'path'  => 'allTicket'
-            ],
-            'part' => [
-                'name'  => 'Parts',
-                'icon'  => 'cpu',
-                'path'  => 'parts'
-            ],
-            'performance' => [
-                'name'  => 'Performance',
-                'icon'  => 'users',
-                'path'  => 'performance'
-            ],
-            'setting' => [
-                'name'  => 'Settings',
-                'icon'  => 'settings',
-                'path'  => 'setting'
+            'sales-report' => [
+                'name'  => 'Sales Report',
+                'icon'  => 'file',
+                'path'  => 'sales-report'
             ],
             'logout' => [
                 'name'  => 'Sign Out',
@@ -138,11 +73,11 @@ class Login extends BaseController
         ];
 
         $access = [
-            'ENGINEER'  => ['dashboard', 'engineer', 'logout'],
-            'CS'        => ['dashboard', 'cs', 'part', 'logout'],
-            'ADMIN'     => ['dashboard', 'cs', 'part', 'allTicket', 'logout'],
-            'MANAGER'   => ['dashboard', 'cs', 'part', 'allTicket', 'performance', 'setting', 'logout'],
-            'SUPERUSER' => ['dashboard', 'cs', 'engineer', 'allTicket', 'part', 'performance', 'setting', 'logout'],
+            'ENGINEER'  => ['dashboard', 'customer-database', 'ship-inquiry', 'sales-report', 'logout'],
+            'CS'        => ['dashboard', 'customer-database', 'ship-inquiry', 'sales-report', 'logout'],
+            'ADMIN'     => ['dashboard', 'customer-database', 'ship-inquiry', 'sales-report', 'logout'],
+            'MANAGER'   => ['dashboard', 'customer-database', 'ship-inquiry', 'sales-report', 'logout'],
+            'SUPERUSER' => ['dashboard', 'customer-database', 'ship-inquiry', 'sales-report', 'logout'],
         ];
 
         if (array_key_exists(strtoupper($type), $access)) {

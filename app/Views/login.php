@@ -9,7 +9,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 	<link rel="shortcut icon" href="assets/img/icons/icon-48x48.png" />
 
-	<title>AppDesk - Login</title>
+	<title>Marcopolo Marine - Login</title>
 
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link href="assets/css/app.css" rel="stylesheet">
@@ -32,31 +32,6 @@
 		</script>
 	<?php endif; ?>
 
-	<!-- Password Change Modal -->
-	<div class="modal fade" id="passwordChangeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Change Password Required</h5>
-				</div>
-				<div class="modal-body">
-					<form id="passwordChangeForm">
-						<div class="mb-3">
-							<label for="newPassword" class="form-label">New Password</label>
-							<input type="password" class="form-control" id="newPassword" required>
-						</div>
-						<div class="mb-3">
-							<label for="retypePassword" class="form-label">Retype Password</label>
-							<input type="password" class="form-control" id="retypePassword" required>
-						</div>
-						<div class="alert alert-danger d-none" id="passwordError"></div>
-						<button type="submit" class="btn btn-primary">Change Password</button>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-
 	<main class="d-flex w-100">
 		<div class="container d-flex flex-column">
 			<div class="row vh-100">
@@ -64,8 +39,8 @@
 					<div class="d-table-cell align-middle">
 
 						<div class="text-center mt-4">
-							<img class="img-fluid" src="/assets/img/logo.png" style="width: 80px; height:auto;">
-							<h1 class="h2">PT. Karya Mura Niaga</h1>
+							<img class="img-fluid" src="<?= base_url('assets/img/logo.png') ?>" style="width: 150px; height:auto;">
+							<h1 class="h2">Marcopolo Marine</h1>
 							<p class="lead">
 								Sign in to your account to continue
 							</p>

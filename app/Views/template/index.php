@@ -43,7 +43,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
 
-    <title>AppDesk</title>
+    <title>Marcopolo Marine</title>
 
     <link href="assets/css/app.css" rel="stylesheet" />
     <link
@@ -77,7 +77,7 @@
                                 href="#"
                                 data-bs-toggle="dropdown">
                                 <img
-                                    src="assets/img/avatars/avatar.jpg"
+                                    src="assets/img/avatars/avatar-2.jpg"
                                     class="avatar img-fluid rounded me-1"
                                     alt="Charles Hall" />
                                 <span class="text-dark"><?= session('name') ?></span>

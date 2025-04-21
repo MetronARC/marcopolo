@@ -1,0 +1,49 @@
+MV Titan Explorer
+Type: Offshore Support Vessel
+Length (LOA): 75.2 m
+Breadth (Beam): 16.5 m
+Draft: 5.4 m
+Gross Tonnage (GT): 3,200
+Status: Completed
+Delivery Date: 2023-11-15
+Class: ABS
+Image: [TitanExplorer.jpg]
+Brochure: [Download PDF]
+
+2. FB Ocean Pearl
+Type: Fishing Boat
+Length (LOA): 28.0 m
+Breadth (Beam): 7.5 m
+Draft: 3.2 m
+Gross Tonnage (GT): 450
+Status: Available
+Delivery Date: –
+Class: Local Registry
+Image: [OceanPearl.jpg]
+Brochure: [Download PDF]
+
+3. MT Petro Navigator
+Type: Oil Tanker
+Length (LOA): 105.4 m
+Breadth (Beam): 18.0 m
+Draft: 7.0 m
+Gross Tonnage (GT): 8,900
+Status: In Progress
+Delivery Date: 2025-05-20
+Class: Lloyd’s Register (LR)
+Image: [PetroNavigator.jpg]
+Brochure: [Download PDF]
+
+Recommended Ship Statuses
+
+Status	                Meaning / When to Use
+Planned	                Ship is in planning/design stage, not yet under construction.
+Under Construction	    Actively being built in the shipyard.
+Delayed	                Construction or delivery delayed due to internal/external factors.
+Completed	            Fully constructed and delivered or ready for handover.
+Available	            Completed and available for sale or customization.
+Under Repair	        Currently docked for repair or refit.
+Awaiting Delivery	    Construction completed, pending delivery or handover.
+Delivered	            Already delivered to client/customer.
+Archived	            Older project, no longer active, for reference only.
+Cancelled	            Project was started/planned but officially cancelled.
